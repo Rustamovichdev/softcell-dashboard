@@ -194,8 +194,8 @@ const Lessons: FC = () => {
 
       {deletingGroup && (
         <ConfirmModal
-          title=" Guruhni o'chirish"
-          description={`"${deletingGroup.group.name}" guruhini o'chirmoqchi bo'lsangiz, ro'yxatdan chiqariladi. Davom etishishni xohlaysiz?`}
+          title="Guruhni o'chirish"
+          description={`"${deletingGroup.group.name}" guruhini o'chirmoqchi bo'lsangiz, ro'yxatdan chiqariladi. Davom etishni xohlaysiz?`}
           danger
           onClose={() => setDeletingGroup(null)}
           onConfirm={() => handleDeleteGroup()}
