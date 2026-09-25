@@ -1,20 +1,16 @@
 import { useState, type FC, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import Pagination from "./components/Pagination";
-import LessonModal from "./components/LessonModal";
-import GroupModal from "./components/GroupModal";
 import LessonsToolbar from "./components/LessonsToolbar";
 import LessonsTable from "./components/LessonsTable";
-import { MOCK_LESSONS, PAGE_SIZE } from "./data";
-import type { Lesson, LessonFormValues, GroupFormValues } from "./types";
+import { PAGE_SIZE } from "./data";
+import { useLessonsStore } from "./store";
 
 const Lessons: FC = () => {
-  const [lessons, setLessons] = useState<Lesson[]>(MOCK_LESSONS);
+  const navigate = useNavigate();
+  const lessons = useLessonsStore((state) => state.lessons);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [expanded, setExpanded] = useState<Set<number>>(new Set());
-  const [isLessonModalOpen, setLessonModalOpen] = useState(false);
-  const [isGroupModalOpen, setGroupModalOpen] = useState(false);
-  const [activeLessonId, setActiveLessonId] = useState<number | null>(null);
 
   const query = search.trim().toLowerCase();
   const filtered = useMemo(
@@ -39,45 +35,6 @@ const Lessons: FC = () => {
     setPage(1);
   };
 
-  const handleAddLesson = (values: LessonFormValues) => {
-    setLessons((prev) => {
-      const nextId = prev.length ? Math.max(...prev.map(({ id }) => id)) + 1 : 1;
-      return [{ id: nextId, ...values, groups: [] }, ...prev];
-    });
-    setPage(1);
-    setLessonModalOpen(false);
-  };
-
-  const handleAddGroup = (lessonId: number, values: GroupFormValues) => {
-    setLessons((prev) =>
-      prev.map((lesson) =>
-        lesson.id === lessonId
-          ? {
-              ...lesson,
-              groups: [
-                ...(lesson.groups ?? []),
-                { id: Date.now(), ...values },
-              ],
-            }
-          : lesson,
-      ),
-    );
-    setExpanded((prev) => new Set(prev).add(lessonId));
-    setGroupModalOpen(false);
-    setActiveLessonId(null);
-  };
-
-  const toggleExpand = (lessonId: number) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(lessonId)) next.delete(lessonId);
-      else next.add(lessonId);
-      return next;
-    });
-  };
-
-  const activeLesson = lessons.find((l) => l.id === activeLessonId) ?? null;
-
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
       <h1 className="text-lg font-semibold sm:text-xl">Lessons</h1>
@@ -85,26 +42,15 @@ const Lessons: FC = () => {
         Jami: {filtered.length} ta dars, {totalGroups} ta guruh
       </p>
 
-      <LessonsToolbar search={search} onSearchChange={handleSearchChange} onAdd={() => setLessonModalOpen(true)} />
+      <LessonsToolbar search={search} onSearchChange={handleSearchChange} onAdd={() => navigate("/lessons/new")} />
 
       <LessonsTable
         lessons={visibleLessons}
         startIndex={startIndex}
-        expanded={expanded}
-        onToggle={toggleExpand}
-        onAddGroup={(lessonId) => { setActiveLessonId(lessonId); setGroupModalOpen(true); }}
+        onViewLesson={(lessonId) => navigate(`/lessons/${lessonId}`)}
       />
 
       <Pagination page={currentPage} totalPages={totalPages} onChange={setPage} />
-
-      {isLessonModalOpen && <LessonModal onClose={() => setLessonModalOpen(false)} onSubmit={handleAddLesson} />}
-      {isGroupModalOpen && activeLesson && (
-        <GroupModal
-          lessonName={activeLesson.name}
-          onClose={() => { setGroupModalOpen(false); setActiveLessonId(null); }}
-          onSubmit={(values) => handleAddGroup(activeLesson.id, values)}
-        />
-      )}
     </section>
   );
 };

@@ -19,8 +19,8 @@ export type UserRole = "admin" | "manager" | "teacher" | "student";
 export type AppRoute = {
   /** Brauzerdagi to'liq manzil, masalan "/students" */
   path: string;
-  /** Menyu, breadcrumb va title uchun nom */
-  label: string;
+  /** Menyu, breadcrumb va title uchun nom (sidebar'da ko'rinishi uchun) */
+  label?: string;
   /** Icon kaliti (icon kutubxonasi ulanganda ishlatiladi) */
   icon?: string;
   /**
@@ -64,6 +64,18 @@ export const appRoutes: AppRoute[] = [
     label: "Lessons",
     icon: "lessons",
     component: lazy(() => import("../pages/dashboard/Lessons")),
+  },
+  {
+    path: "/lessons/new",
+    component: lazy(() => import("../pages/dashboard/Lessons/LessonFormPage")),
+  },
+  {
+    path: "/lessons/:lessonId",
+    component: lazy(() => import("../pages/dashboard/Lessons/LessonDetailPage")),
+  },
+  {
+    path: "/lessons/:lessonId/add-group",
+    component: lazy(() => import("../pages/dashboard/Lessons/AddGroupPage")),
   },
   {
     path: "/meets",
