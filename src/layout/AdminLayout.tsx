@@ -6,7 +6,7 @@ import Header from "./Header";
 
 const AdminLayout: FC = () => {
     // TODO: rol auth store / redux dan olinadi va getRoutesByRole(role) ga uzatiladi
-    const routes = getRoutesByRole();
+    const routes = getRoutesByRole().filter((r) => r.label);
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     // Escape tugmasi bilan mobil menyuni yopish
