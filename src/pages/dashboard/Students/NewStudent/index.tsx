@@ -5,9 +5,31 @@ import type { StudentFormValues } from "../types";
 
 const studentSchema = z.object({
   ism: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak"),
-  familya: z.string().min(2, "Familya kamida 2 ta belgidan iborat bo'lishi kerak"),
-  raqam: z.string().regex(/^998\s?\d{9}$/, "Raqam formati: 998 901234567"),
+  familya: z
+    .string()
+    .min(2, "Familya kamida 2 ta belgidan iborat bo'lishi kerak"),
+  raqam: z
+    .string()
+    .regex(/^998\s?\d{9}$/, "Raqam formati: 998 901234567"),
   gmail: z.email("Gmail noto'g'ri kiritilgan"),
+
+  otaIsmi: z
+    .string()
+    .min(2, "Ota ismi kamida 2 ta belgidan iborat bo'lishi kerak"),
+
+  otaFamilya: z
+    .string()
+    .min(2, "Ota familyasi kamida 2 ta belgidan iborat bo'lishi kerak"),
+
+  onaIsmi: z
+    .string()
+    .min(2, "Ona ismi kamida 2 ta belgidan iborat bo'lishi kerak"),
+
+  onaFamilya: z
+    .string()
+    .min(2, "Ona familyasi kamida 2 ta belgidan iborat bo'lishi kerak"),
+
+  passportRaqami: z.string().optional(),
 });
 
 type NewStudentProps = {
@@ -30,6 +52,11 @@ const NewStudent = ({ onBack, onSave }: NewStudentProps) => {
       familya: "",
       raqam: "998 ",
       gmail: "",
+      otaIsmi: "",
+      otaFamilya: "",
+      onaIsmi: "",
+      onaFamilya: "",
+      passportRaqami: "",
     },
   });
 
@@ -57,10 +84,14 @@ const NewStudent = ({ onBack, onSave }: NewStudentProps) => {
 
       <form
         onSubmit={handleSubmit(onSave)}
-        className="mt-6 max-w-2xl space-y-4"
+        className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 lg:grid-cols-2"
       >
+        {/* CHAP TOMON */}
+
         <label className="block">
-          <span className="text-sm font-medium text-gray-600">Ism</span>
+          <span className="text-sm font-medium text-gray-600">
+            Ism
+          </span>
 
           <input
             {...register("ism")}
@@ -72,6 +103,25 @@ const NewStudent = ({ onBack, onSave }: NewStudentProps) => {
           {errors.ism && (
             <p className="mt-1 text-xs text-red-500">
               {errors.ism.message}
+            </p>
+          )}
+        </label>
+
+        <label className="block">
+          <span className="text-sm font-medium text-gray-600">
+            Ota ismi
+          </span>
+
+          <input
+            {...register("otaIsmi")}
+            type="text"
+            placeholder="Olim"
+            className={`mt-1.5 ${fieldClass}`}
+          />
+
+          {errors.otaIsmi && (
+            <p className="mt-1 text-xs text-red-500">
+              {errors.otaIsmi.message}
             </p>
           )}
         </label>
@@ -97,6 +147,25 @@ const NewStudent = ({ onBack, onSave }: NewStudentProps) => {
 
         <label className="block">
           <span className="text-sm font-medium text-gray-600">
+            Ota familyasi
+          </span>
+
+          <input
+            {...register("otaFamilya")}
+            type="text"
+            placeholder="Shehnazarov"
+            className={`mt-1.5 ${fieldClass}`}
+          />
+
+          {errors.otaFamilya && (
+            <p className="mt-1 text-xs text-red-500">
+              {errors.otaFamilya.message}
+            </p>
+          )}
+        </label>
+
+        <label className="block">
+          <span className="text-sm font-medium text-gray-600">
             Raqam
           </span>
 
@@ -110,6 +179,25 @@ const NewStudent = ({ onBack, onSave }: NewStudentProps) => {
           {errors.raqam && (
             <p className="mt-1 text-xs text-red-500">
               {errors.raqam.message}
+            </p>
+          )}
+        </label>
+
+        <label className="block">
+          <span className="text-sm font-medium text-gray-600">
+            Ona ismi
+          </span>
+
+          <input
+            {...register("onaIsmi")}
+            type="text"
+            placeholder="Malika"
+            className={`mt-1.5 ${fieldClass}`}
+          />
+
+          {errors.onaIsmi && (
+            <p className="mt-1 text-xs text-red-500">
+              {errors.onaIsmi.message}
             </p>
           )}
         </label>
@@ -133,7 +221,44 @@ const NewStudent = ({ onBack, onSave }: NewStudentProps) => {
           )}
         </label>
 
-        <div className="flex gap-3 pt-2">
+        <label className="block">
+          <span className="text-sm font-medium text-gray-600">
+            Ona familyasi
+          </span>
+
+          <input
+            {...register("onaFamilya")}
+            type="text"
+            placeholder="Shehnazarova"
+            className={`mt-1.5 ${fieldClass}`}
+          />
+
+          {errors.onaFamilya && (
+            <p className="mt-1 text-xs text-red-500">
+              {errors.onaFamilya.message}
+            </p>
+          )}
+        </label>
+
+        <label className="block lg:col-start-2">
+          <span className="text-sm font-medium text-gray-600">
+            Pasport raqami{" "}
+            <span className="font-normal text-gray-400">
+              (ixtiyoriy)
+            </span>
+          </span>
+
+          <input
+            {...register("passportRaqami")}
+            type="text"
+            placeholder="AA1234567"
+            className={`mt-1.5 ${fieldClass}`}
+          />
+        </label>
+
+        {/* TUGMALAR */}
+
+        <div className="flex gap-3 pt-2 lg:col-span-2">
           <button
             type="button"
             onClick={onBack}

@@ -1,36 +1,66 @@
 import type { Student } from "./types";
 
-export const PAGE_SIZE = 5;
+export const PAGE_SIZE = 20;
 
-export const MOCK_STUDENTS: Student[] = [
-  { id: 1, ism: "Abdulox", familya: "Shehnazarov", raqam: "998 264373563", gmail: "abdulo@gmail.com" },
-  { id: 2, ism: "Malika", familya: "Yusupova", raqam: "998 901234567", gmail: "malika.yusupova@gmail.com" },
-  { id: 3, ism: "Jasur", familya: "Rahmonov", raqam: "998 911234568", gmail: "jasur.rahmonov@gmail.com" },
-  { id: 4, ism: "Dilnoza", familya: "Ergasheva", raqam: "998 933456789", gmail: "dilnoza.e@gmail.com" },
-  { id: 5, ism: "Sardor", familya: "Aliyev", raqam: "998 945678901", gmail: "sardor.aliyev@gmail.com" },
-  { id: 6, ism: "Madina", familya: "Tursunova", raqam: "998 977654321", gmail: "madina.tursunova@gmail.com" },
-  { id: 7, ism: "Aziz", familya: "Karimov", raqam: "998 901112233", gmail: "aziz.karimov@gmail.com" },
-  { id: 8, ism: "Zarina", familya: "Rasulova", raqam: "998 902223344", gmail: "zarina.rasulova@gmail.com" },
-  { id: 9, ism: "Bekzod", familya: "Ismoilov", raqam: "998 903334455", gmail: "bekzod.ismoilov@gmail.com" },
-  { id: 10, ism: "Mohira", familya: "Qodirova", raqam: "998 904445566", gmail: "mohira.qodirova@gmail.com" },
-  { id: 11, ism: "Diyor", familya: "Nazarov", raqam: "998 905556677", gmail: "diyor.nazarov@gmail.com" },
-  { id: 12, ism: "Shahnoza", familya: "Abdullayeva", raqam: "998 906667788", gmail: "shahnoza.abdullayeva@gmail.com" },
-  { id: 13, ism: "Temur", familya: "Saidov", raqam: "998 907778899", gmail: "temur.saidov@gmail.com" },
-  { id: 14, ism: "Sevinch", familya: "Raximova", raqam: "998 908889900", gmail: "sevinch.raximova@gmail.com" },
-  { id: 15, ism: "Oybek", familya: "Mamatov", raqam: "998 909990011", gmail: "oybek.mamatov@gmail.com" },
-  { id: 16, ism: "Nodira", familya: "Toshpulatova", raqam: "998 910101112", gmail: "nodira.toshpulatova@gmail.com" },
-  { id: 17, ism: "Kamron", familya: "Yuldashev", raqam: "998 911212223", gmail: "kamron.yuldashev@gmail.com" },
-  { id: 18, ism: "Rustam", familya: "Oripov", raqam: "998 912323334", gmail: "rustam.oripov@gmail.com" },
-  { id: 19, ism: "Laylo", familya: "Husanova", raqam: "998 913434445", gmail: "laylo.husanova@gmail.com" },
-  { id: 20, ism: "Javohir", familya: "Usmonov", raqam: "998 914545556", gmail: "javohir.usmonov@gmail.com" },
-  { id: 21, ism: "Nargiza", familya: "Tursunova", raqam: "998 915656667", gmail: "nargiza.tursunova@gmail.com" },
-  { id: 22, ism: "Farrux", familya: "Qosimov", raqam: "998 916767778", gmail: "farrux.qosimov@gmail.com" },
-  { id: 23, ism: "Munisa", familya: "Yusupova", raqam: "998 917878889", gmail: "munisa.yusupova@gmail.com" },
-  { id: 24, ism: "Bobur", familya: "Hamroyev", raqam: "998 918989990", gmail: "bobur.hamroyev@gmail.com" },
-  { id: 25, ism: "Durdona", familya: "Sattorova", raqam: "998 919090101", gmail: "durdona.sattorova@gmail.com" },
-  { id: 26, ism: "Akmal", familya: "Rahimov", raqam: "998 920101212", gmail: "akmal.rahimov@gmail.com" },
-  { id: 27, ism: "Gulnoza", familya: "Aliyeva", raqam: "998 921212323", gmail: "gulnoza.aliyeva@gmail.com" },
-  { id: 28, ism: "Siroj", familya: "Ergashev", raqam: "998 922323434", gmail: "siroj.ergashev@gmail.com" },
-  { id: 29, ism: "Shahzoda", familya: "Nabiyeva", raqam: "998 923434545", gmail: "shahzoda.nabiyeva@gmail.com" },
-  { id: 30, ism: "Jasmina", familya: "Qodirova", raqam: "998 924545656", gmail: "jasmina.qodirova@gmail.com" },
+const firstNames = [
+  "Abdulox",
+  "Malika",
+  "Jasur",
+  "Dilnoza",
+  "Sardor",
+  "Madina",
+  "Aziz",
+  "Zarina",
+  "Bekzod",
+  "Mohira",
+  "Diyor",
+  "Shahnoza",
+  "Temur",
+  "Sevinch",
+  "Oybek",
+  "Nodira",
+  "Kamron",
+  "Rustam",
+  "Laylo",
+  "Javohir",
 ];
+
+const lastNames = [
+  "Shehnazarov",
+  "Yusupova",
+  "Rahmonov",
+  "Ergasheva",
+  "Aliyev",
+  "Tursunova",
+  "Karimov",
+  "Rasulova",
+  "Ismoilov",
+  "Qodirova",
+  "Nazarov",
+  "Abdullayeva",
+  "Saidov",
+  "Raximova",
+  "Mamatov",
+  "Toshpulatova",
+  "Yuldashev",
+  "Oripov",
+  "Husanova",
+  "Usmonov",
+];
+
+export const MOCK_STUDENTS: Student[] = Array.from(
+  { length: 100 },
+  (_, index) => {
+    const firstName = firstNames[index % firstNames.length];
+    const lastName = lastNames[index % lastNames.length];
+    const number = 900000000 + index;
+
+    return {
+      id: index + 1,
+      ism: firstName,
+      familya: lastName,
+      raqam: `998 ${number}`,
+      gmail: `${firstName.toLowerCase()}.${index + 1}@gmail.com`,
+    };
+  },
+);
