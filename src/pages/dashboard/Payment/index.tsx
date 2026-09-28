@@ -1,7 +1,7 @@
 import { useState, type FC, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import PaymentsToolbar from "./components/PaymentsToolbar";
-import PaymentsTable from "./components/PaymentsTable";
+import PaymentsTable, { groupByStudent } from "./components/PaymentsTable";
 import Pagination from "./components/Pagination";
 import { PAGE_SIZE } from "./data";
 import { usePaymentsStore } from "./store";
@@ -31,10 +31,13 @@ const Payment: FC = () => {
     [payments, query, statusFilter, methodFilter],
   );
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  // Avval o'quvchilar bo'yicha goplaymiz, keyin sahifalaymiz
+  const students = useMemo(() => groupByStudent(filtered), [filtered]);
+
+  const totalPages = Math.max(1, Math.ceil(students.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const visiblePayments = filtered.slice(startIndex, startIndex + PAGE_SIZE);
+  const visibleStudents = students.slice(startIndex, startIndex + PAGE_SIZE);
 
   const totalAmount = useMemo(
     () => payments.reduce((sum, p) => sum + p.amount, 0),
@@ -70,7 +73,7 @@ const Payment: FC = () => {
         <div>
           <h1 className="text-lg font-semibold sm:text-xl">To'lovlar</h1>
           <p className="mt-1.5 text-xs text-gray-500 sm:mt-2 sm:text-sm">
-            Jami: {filtered.length} ta to'lov
+            Jami: {students.length} ta o'quvchi, {filtered.length} ta oylik to'lov
           </p>
         </div>
 
@@ -107,9 +110,9 @@ const Payment: FC = () => {
       />
 
       <PaymentsTable
-        payments={visiblePayments}
+        students={visibleStudents}
         startIndex={startIndex}
-        onViewPayment={(paymentId) => navigate(`/payment/${paymentId}`)}
+        onViewSchedule={() => navigate("/payment/schedule")}
       />
 
       <Pagination page={currentPage} totalPages={totalPages} onChange={setPage} />

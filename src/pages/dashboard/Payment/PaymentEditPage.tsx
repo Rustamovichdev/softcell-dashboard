@@ -6,6 +6,7 @@ import { z } from "zod";
 import Button from "../../../components/ui/Button";
 import Icon from "../../../components/ui/Icon";
 import type { Payment, PaymentFormValues } from "./types";
+import { STUDENTS } from "./data";
 import { usePaymentsStore } from "./store";
 
 const paymentSchema = z.object({
@@ -22,25 +23,12 @@ const paymentSchema = z.object({
   description: z.string().min(5, "Tavsif kamida 5 ta belgidan iborat bo'lishi kerak"),
   dueAmount: z.coerce.number().min(0),
   paidAmount: z.coerce.number().min(0),
+  month: z.coerce.number().min(1, "Oy 1 dan katta bo'lishi kerak").max(12, "Oy 12 dan kichik bo'lishi kerak"),
+  totalMonths: z.coerce.number().min(1, "Kurs davomiyligi 1 dan katta bo'lishi kerak").max(24, "Kurs davomiyligi 24 dan kichik bo'lishi kerak"),
 });
 
 const fieldClassName = "h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white";
 const labelClassName = "text-xs font-medium text-gray-600 sm:text-sm";
-
-const students = [
-  { id: 1, name: "Ali Karimov" },
-  { id: 2, name: "Malika Rahimova" },
-  { id: 3, name: "Jasur Bekmurodov" },
-  { id: 4, name: "Nodira Yusupova" },
-  { id: 5, name: "Bobur Olimov" },
-  { id: 6, name: "Shahlo Karimova" },
-  { id: 7, name: "Temur Aliev" },
-  { id: 8, name: "Dilnoza Hamidova" },
-  { id: 9, name: "Aziz Normatov" },
-  { id: 10, name: "Gulnoza Rasulova" },
-  { id: 11, name: "Farrux Toshmatov" },
-  { id: 12, name: "Madina Abdullayeva" },
-];
 
 const lessons = [
   { id: 1, name: "Frontend Development" },
@@ -87,7 +75,7 @@ const PaymentEditPage: FC = () => {
     resolver: zodResolver(paymentSchema) as Resolver<PaymentFormValues>,
     defaultValues: {
       studentId: 1,
-      studentName: "Ali Karimov",
+      studentName: STUDENTS[0].name,
       lessonId: 1,
       lessonName: "Frontend Development",
       groupId: 101,
@@ -120,11 +108,14 @@ const PaymentEditPage: FC = () => {
       setValue("description", payment.description);
       setValue("dueAmount", payment.dueAmount);
       setValue("paidAmount", payment.paidAmount);
+      setValue("dueDate", payment.dueDate ? payment.dueDate.slice(0, 10) : "");
+      setValue("month", payment.month);
+      setValue("totalMonths", payment.totalMonths);
     }
   }, [payment, setValue]);
 
   const onStudentChange = (value: string) => {
-    const student = students.find((s) => s.id === Number(value));
+    const student = STUDENTS.find((s) => s.id === Number(value));
     if (student) setValue("studentName", student.name);
   };
 
@@ -186,7 +177,7 @@ const PaymentEditPage: FC = () => {
           <label className="flex flex-col gap-1.5">
             <span className={labelClassName}>Talaba</span>
             <select {...register("studentId", { onChange: onStudentChange })} className={fieldClassName}>
-              {students.map((s) => (
+              {STUDENTS.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
                 </option>
@@ -276,6 +267,40 @@ const PaymentEditPage: FC = () => {
               <option value="click">Click</option>
               <option value="payme">Payme</option>
             </select>
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClassName}>Oy (1-12)</span>
+            <input
+              {...register("month")}
+              type="number"
+              min="1"
+              max="12"
+              placeholder="1"
+              className={fieldClassName}
+            />
+            {errors.month && <span className="text-xs text-red-500">{errors.month.message}</span>}
+          </label>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClassName}>Umumiy kurs davomiyligi (oy)</span>
+            <input
+              {...register("totalMonths")}
+              type="number"
+              min="1"
+              max="24"
+              placeholder="6"
+              className={fieldClassName}
+            />
+            {errors.totalMonths && <span className="text-xs text-red-500">{errors.totalMonths.message}</span>}
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClassName}>To'lov muddati (sana)</span>
+            <input {...register("dueDate")} type="date" className={fieldClassName} />
+            {errors.dueDate && <span className="text-xs text-red-500">{errors.dueDate.message}</span>}
           </label>
         </div>
 
