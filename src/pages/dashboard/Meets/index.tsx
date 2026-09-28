@@ -4,7 +4,37 @@ import {
   Search, Plus, Calendar, List, Clock, Video, 
   Trash2, Edit3, ExternalLink, Sparkles, Copy, Wand2, Link2, X
 } from 'lucide-react';
-import type { Meet, MeetFormData, ViewMode } from './types';
+
+// --- Types & Interfaces ---
+export type ViewMode = 'list' | 'calendar';
+export type PlatformType = 'Google Meet' | 'Zoom' | 'Softcell Live';
+export type MeetStatus = 'Upcoming' | 'Live' | 'Completed';
+
+export interface Meet {
+  id: string;
+  title: string;
+  group: string;
+  date: string;
+  time: string;
+  duration: string;
+  platform: PlatformType | string;
+  link: string;
+  status: MeetStatus | string;
+  description?: string;
+}
+
+export interface MeetFormData {
+  title: string;
+  group: string;
+  date: string;
+  time: string;
+  duration: string;
+  platform: PlatformType | string;
+  link: string;
+  description: string;
+}
+
+// --- Constants ---
 const GROUPS: string[] = [
   "Front-End", 
   "Matematika", 
@@ -89,6 +119,7 @@ const INITIAL_MEETS: Meet[] = [
   }
 ];
 
+// --- Component ---
 export default function Meets() {
   const [meets, setMeets] = useState<Meet[]>(INITIAL_MEETS);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -208,7 +239,7 @@ export default function Meets() {
   };
 
   return (
-    <div className="flex-1 bg-[#F8FAFC] min-h-screen text-slate-800 p-8">
+    <div className="flex-1 bg-[#F8FAFC] h-screen overflow-hidden flex flex-col text-slate-800 p-8">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
@@ -217,140 +248,146 @@ export default function Meets() {
         </div>
       )}
 
-      {/* Header Banner */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">Meets (Uchrashuvlar)</h2>
-          <p className="text-sm text-slate-500 mt-1">Guruhlar uchun onlayn darslar linklarini yaratish va boshqarish.</p>
+      {/* --- FIXED TOP SECTION (Qotib turadigan tepa qism) --- */}
+      <div className="shrink-0">
+        {/* Header Banner */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Meets (Uchrashuvlar)</h2>
+            <p className="text-sm text-slate-500 mt-1">Guruhlar uchun onlayn darslar linklarini yaratish va boshqarish.</p>
+          </div>
+          <button
+            onClick={handleOpenCreateModal}
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl transition-all cursor-pointer"
+          >
+            <Plus className="w-4 h-4" /> Yangi uchrashuv yaratish
+          </button>
         </div>
-        <button
-          onClick={handleOpenCreateModal}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl transition-all cursor-pointer"
-        >
-          <Plus className="w-4 h-4" /> Yangi uchrashuv yaratish
-        </button>
-      </div>
 
-      {/* Filter Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-4 flex-1 min-w-[280px]">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Ssilka yoki uchrashuv nomi..." 
-              value={searchQuery}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none"
-            />
+        {/* Filter Bar */}
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4 flex-1 min-w-[280px]">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Ssilka yoki uchrashuv nomi..." 
+                value={searchQuery}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none"
+              />
+            </div>
+
+            <select 
+              value={selectedGroupFilter}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedGroupFilter(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-lg text-sm py-2 px-3 text-slate-700 font-medium"
+            >
+              <option value="All">Barcha guruhlar</option>
+              {GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
           </div>
 
-          <select 
-            value={selectedGroupFilter}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedGroupFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded-lg text-sm py-2 px-3 text-slate-700 font-medium"
-          >
-            <option value="All">Barcha guruhlar</option>
-            {GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
-          </select>
-        </div>
-
-        <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
-          <button
-            onClick={() => setViewMode('list')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md ${
-              viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
-            }`}
-          >
-            <List className="w-4 h-4" /> Ro'yxat
-          </button>
-          <button
-            onClick={() => setViewMode('calendar')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md ${
-              viewMode === 'calendar' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
-            }`}
-          >
-            <Calendar className="w-4 h-4" /> Kalendar
-          </button>
+          <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md ${
+                viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+              }`}
+            >
+              <List className="w-4 h-4" /> Ro'yxat
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md ${
+                viewMode === 'calendar' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'
+              }`}
+            >
+              <Calendar className="w-4 h-4" /> Kalendar
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* List View */}
-      {viewMode === 'list' ? (
-        <div className="space-y-4">
-          {filteredMeets.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
-              <Video className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-slate-800">Uchrashuvlar topilmadi</h3>
-            </div>
-          ) : (
-            filteredMeets.map((meet) => (
-              <div key={meet.id} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col lg:flex-row justify-between gap-6">
-                <div className="space-y-3 flex-1">
-                  <div className="flex items-center gap-3">
-                    {meet.status === 'Live' ? (
-                      <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full animate-pulse">Jonli 🔴</span>
-                    ) : (
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">Kutilmoqda</span>
-                    )}
-                    <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-100">{meet.group}</span>
-                    <span className="text-xs text-slate-400 font-medium">• {meet.platform}</span>
+      {/* --- SCROLLABLE CONTENT AREA (Skroll bo'ladigan pastki ro'yxat qismi) --- */}
+      <div className="flex-1 overflow-y-auto pr-1">
+        {/* List View */}
+        {viewMode === 'list' ? (
+          <div className="space-y-4 pb-6">
+            {filteredMeets.length === 0 ? (
+              <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
+                <Video className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <h3 className="text-lg font-bold text-slate-800">Uchrashuvlar topilmadi</h3>
+              </div>
+            ) : (
+              filteredMeets.map((meet) => (
+                <div key={meet.id} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col lg:flex-row justify-between gap-6">
+                  <div className="space-y-3 flex-1">
+                    <div className="flex items-center gap-3">
+                      {meet.status === 'Live' ? (
+                        <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full animate-pulse">Jonli 🔴</span>
+                      ) : (
+                        <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">Kutilmoqda</span>
+                      )}
+                      <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-100">{meet.group}</span>
+                      <span className="text-xs text-slate-400 font-medium">• {meet.platform}</span>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-slate-900">{meet.title}</h3>
+
+                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2 rounded-xl max-w-xl">
+                      <Link2 className="w-4 h-4 text-indigo-600 shrink-0" />
+                      <span className="text-xs font-mono text-slate-700 truncate flex-1">{meet.link}</span>
+                      <button
+                        onClick={() => handleCopyLink(meet.link)}
+                        className="flex items-center gap-1 px-2.5 py-1 bg-white text-indigo-700 rounded-lg text-xs font-semibold border border-indigo-200 hover:bg-indigo-50 transition-colors"
+                      >
+                        <Copy className="w-3 h-3" /> Nusxalash
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-xs text-slate-500 font-medium">
+                      <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{meet.date}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{meet.time} ({meet.duration} min)</span>
+                    </div>
                   </div>
 
-                  <h3 className="text-lg font-bold text-slate-900">{meet.title}</h3>
-
-                  <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-2 rounded-xl max-w-xl">
-                    <Link2 className="w-4 h-4 text-indigo-600 shrink-0" />
-                    <span className="text-xs font-mono text-slate-700 truncate flex-1">{meet.link}</span>
-                    <button
-                      onClick={() => handleCopyLink(meet.link)}
-                      className="flex items-center gap-1 px-2.5 py-1 bg-white text-indigo-700 rounded-lg text-xs font-semibold border border-indigo-200 hover:bg-indigo-50 transition-colors"
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={meet.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
                     >
-                      <Copy className="w-3 h-3" /> Nusxalash
+                      <ExternalLink className="w-3.5 h-3.5" /> Kirish
+                    </a>
+                    <button onClick={() => handleOpenEditModal(meet)} className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDeleteMeet(meet.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-
-                  <div className="flex items-center gap-4 text-xs text-slate-500 font-medium">
-                    <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{meet.date}</span>
-                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{meet.time} ({meet.duration} min)</span>
-                  </div>
                 </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <a
-                    href={meet.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" /> Kirish
-                  </a>
-                  <button onClick={() => handleOpenEditModal(meet)} className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
-                    <Edit3 className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => handleDeleteMeet(meet.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+              ))
+            )}
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm mb-6">
+            <h3 className="text-lg font-bold mb-4">Darslar Taqvimi</h3>
+            <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 mb-2">
+              <div>DUSH</div><div>SESH</div><div>CHOR</div><div>PAYS</div><div>JUM</div><div>SHAN</div><div>YAK</div>
+            </div>
+            <div className="grid grid-cols-7 gap-2">
+              {Array.from({ length: 30 }).map((_, i) => (
+                <div key={i} className="min-h-[80px] bg-slate-50 border border-slate-100 p-2 rounded-xl text-xs font-bold text-slate-500">
+                  {i + 1}
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-      ) : (
-        <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-          <h3 className="text-lg font-bold mb-4">Darslar Taqvimi</h3>
-          <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 mb-2">
-            <div>DUSH</div><div>SESH</div><div>CHOR</div><div>PAYS</div><div>JUM</div><div>SHAN</div><div>YAK</div>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-7 gap-2">
-            {Array.from({ length: 30 }).map((_, i) => (
-              <div key={i} className="min-h-[80px] bg-slate-50 border border-slate-100 p-2 rounded-xl text-xs font-bold text-slate-500">
-                {i + 1}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Modal Form */}
       {isModalOpen && (
