@@ -1,3 +1,4 @@
+
 import { useRef, useState, type FC, type FormEvent } from "react";
 import ProfileModal from "../components/common/ProfileModal";
 import Icon from "../components/ui/Icon";
@@ -14,16 +15,19 @@ import { useAppSelector } from "../store";
 import type { Language } from "../types";
 import { getInitials } from "../utils/helper";
 
+
 /** Saqlangan tilni o'qiydi (bo'lmasa - uz) */
 const readStoredLanguage = (): Language => {
   const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
   return stored === "uz" || stored === "ru" ? stored : "uz";
 };
 
+
 type HeaderProps = {
   /** Mobil qurilmada sidebar'ni ochish */
   onMenuClick: () => void;
 };
+
 
 type SearchFieldProps = {
   value: string;
@@ -32,6 +36,7 @@ type SearchFieldProps = {
   onChange: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 };
+
 
 /** Qidiruv maydoni (desktop va mobil uchun bir xil) */
 const SearchField: FC<SearchFieldProps> = ({
@@ -57,6 +62,7 @@ const SearchField: FC<SearchFieldProps> = ({
   </form>
 );
 
+
 const Header: FC<HeaderProps> = ({ onMenuClick }) => {
   const [search, setSearch] = useState("");
   const [isSearchOpen, setSearchOpen] = useState(false);
@@ -67,25 +73,29 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
   const [isNotificationsOpen, setNotificationsOpen] = useState(false);
   const [isProfileOpen, setProfileOpen] = useState(false);
 
+
   const languageRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
+
 
   useClickOutside(languageRef, () => setLanguageOpen(false), isLanguageOpen);
   useClickOutside(notificationsRef, () => setNotificationsOpen(false), isNotificationsOpen);
 
+
   const unreadCount = NOTIFICATIONS.filter(({ unread }) => unread).length;
+
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO: keyinchalik sahifalar bo'ylab qidiruv (route/filter bo'yicha) qo'shiladi
   };
+
 
   const handleLanguageChange = (value: Language) => {
     setLanguage(value);
     localStorage.setItem(LANGUAGE_STORAGE_KEY, value);
     setLanguageOpen(false);
-    // TODO: i18n (tarjimalar) tanlangan tilga o'tadi
   };
+
 
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center gap-1.5 border-b border-gray-200 bg-white px-3 sm:gap-3 sm:px-4 lg:px-6">
@@ -99,6 +109,7 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
         <Icon name="menu" />
       </button>
 
+
       {/* Desktop qidiruv */}
       <SearchField
         value={search}
@@ -106,6 +117,7 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
         onSubmit={handleSearch}
         className="hidden max-w-md md:block"
       />
+
 
       <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
         {/* Mobil qidiruv tugmasi */}
@@ -121,6 +133,7 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
         >
           <Icon name={isSearchOpen ? "close" : "search"} />
         </button>
+
 
         {/* Notificationlar */}
         <div ref={notificationsRef} className="relative">
@@ -142,6 +155,7 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
             )}
           </button>
 
+
           {isNotificationsOpen && (
             <div className="fixed inset-x-3 top-16 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-80">
               <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
@@ -152,8 +166,9 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
                 {NOTIFICATIONS.map(({ id, title, description, time, unread }) => (
                   <li
                     key={id}
-                    className={`border-b border-gray-50 px-4 py-3 last:border-0 ${unread ? "bg-gray-50/70" : ""
-                      }`}
+                    className={`border-b border-gray-50 px-4 py-3 last:border-0 ${
+                      unread ? "bg-gray-50/70" : ""
+                    }`}
                   >
                     <p className="text-sm font-medium text-gray-900">{title}</p>
                     <p className="mt-0.5 text-xs text-gray-500">{description}</p>
@@ -164,6 +179,7 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
             </div>
           )}
         </div>
+
 
         {/* Til tanlash */}
         <div ref={languageRef} className="relative">
@@ -182,6 +198,7 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
             <Icon name="chevron-down" className="h-3.5 w-3.5" />
           </button>
 
+
           {isLanguageOpen && (
             <div className="absolute right-0 mt-2 w-32 overflow-hidden rounded-xl border border-gray-200 bg-white py-1 shadow-lg">
               {LANGUAGES.map(({ value, label }) => (
@@ -189,8 +206,9 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
                   key={value}
                   type="button"
                   onClick={() => handleLanguageChange(value)}
-                  className={`flex w-full items-center justify-between px-3 py-2 text-sm transition hover:bg-gray-50 ${value === language ? "font-semibold text-gray-900" : "text-gray-600"
-                    }`}
+                  className={`flex w-full items-center justify-between px-3 py-2 text-sm transition hover:bg-gray-50 ${
+                    value === language ? "font-semibold text-gray-900" : "text-gray-600"
+                  }`}
                 >
                   {label}
                   {value === language && <Icon name="check" className="h-4 w-4" />}
@@ -199,6 +217,7 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
             </div>
           )}
         </div>
+
 
         {/* Profil */}
         <button
@@ -222,12 +241,14 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
         </button>
       </div>
 
+
       {/* Mobil qidiruv paneli */}
       {isSearchOpen && (
         <div className="absolute inset-x-0 top-full border-b border-gray-200 bg-white p-3 shadow-sm md:hidden">
           <SearchField value={search} autoFocus onChange={setSearch} onSubmit={handleSearch} />
         </div>
       )}
+
 
       <ProfileModal
         isOpen={isProfileOpen}
@@ -238,5 +259,6 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
     </header>
   );
 };
+
 
 export default Header;

@@ -1,3 +1,4 @@
+
 import { useEffect, type FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ROUTE } from "../../constants/data";
@@ -31,22 +32,34 @@ const ProfileModal: FC<ProfileModalProps> = ({ isOpen, user, items, onClose }) =
 
   if (!isOpen) return null;
 
-  const handleItemClick = ({ key, path }: ProfileMenuItem) => {
+  const handleItemClick = (item: ProfileMenuItem) => {
     onClose();
 
-    if (key === "signout") {
-      // Sessiya tozalanadi (token + user) va login sahifasiga qaytariladi
+    // 1. Chiqish tugmasi
+    if (item.key === "signout") {
       dispatch(logout());
       navigate(LOGIN_ROUTE, { replace: true });
       return;
     }
 
-    if (path) {
-      navigate(path);
+    // 2. Agar tayyor path mavjud bo'lsa
+    if (item.path) {
+      navigate(item.path);
       return;
     }
 
-    // TODO: "account" va "help" sahifalari qo'shilgandan keyin navigate qilinadi
+    // 3. My Account bosilganda /profile sahifasiga o'tadi
+    const itemKey = String(item.key).toLowerCase();
+    if (itemKey === "account" || itemKey.includes("account")) {
+      navigate("/profile");
+      return;
+    }
+
+    // 4. Settings bosilganda
+    if (itemKey === "settings") {
+      navigate("/settings");
+      return;
+    }
   };
 
   return (
@@ -85,10 +98,11 @@ const ProfileModal: FC<ProfileModalProps> = ({ isOpen, user, items, onClose }) =
               key={item.key}
               type="button"
               onClick={() => handleItemClick(item)}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition ${item.danger
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition ${
+                item.danger
                   ? "text-red-600 hover:bg-red-50"
                   : "text-gray-700 hover:bg-gray-50"
-                }`}
+              }`}
             >
               <Icon name={item.icon} className="h-4 w-4" />
               {item.label}

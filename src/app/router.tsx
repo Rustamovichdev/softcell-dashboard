@@ -5,12 +5,15 @@ import { DASHBOARD_ROUTE, LOGIN_ROUTE } from "../constants/data";
 import { PublicOnly, RequireAuth } from "../features/auth/guards";
 import AdminLayout from "../layout/AdminLayout";
 
+
 /* ------------------------------------------------------------------ */
-/*  Types                                                              */
+/*  Types                                                             */
 /* ------------------------------------------------------------------ */
+
 
 /** Tizimdagi foydalanuvchi rollari (keyinchalik to'ldiriladi) */
 export type UserRole = "admin" | "manager" | "teacher" | "student";
+
 
 /**
  * Bitta route tavsifi (data ko'rinishida).
@@ -34,9 +37,11 @@ export type AppRoute = {
   children?: AppRoute[];
 };
 
+
 /* ------------------------------------------------------------------ */
-/*  Routes (data)                                                      */
+/*  Routes (data)                                                     */
 /* ------------------------------------------------------------------ */
+
 
 /** AdminLayout ichida ko'rinadigan routelar */
 export const appRoutes: AppRoute[] = [
@@ -141,7 +146,20 @@ export const appRoutes: AppRoute[] = [
     icon: "settings",
     component: lazy(() => import("../pages/dashboard/Settings")),
   },
+  {
+    path: "/profile",
+    label: "Profile",
+    icon: "profile",
+    component: lazy(() => import("../pages/dashboard/Profile")),
+  },
+  {
+    path: "/account",
+    label: "My Account",
+    icon: "account",
+    component: lazy(() => import("../pages/dashboard/Profile")),
+  },
 ];
+
 
 /** Layoutsiz (auth) routelar */
 export const authRoutes: AppRoute[] = [
@@ -152,9 +170,11 @@ export const authRoutes: AppRoute[] = [
   },
 ];
 
+
 /* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
+/*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
+
 
 /**
  * Berilgan rolga ruxsat etilgan routelarni qaytaradi.
@@ -167,11 +187,13 @@ export const getRoutesByRole = (
 ): AppRoute[] =>
   routes.filter(({ roles }) => !roles?.length || (role !== undefined && roles.includes(role)));
 
+
 const withSuspense = (Component: LazyExoticComponent<ComponentType>) => (
   <Suspense fallback={<PageLoader />}>
     <Component />
   </Suspense>
 );
+
 
 /** AppRoute (data) -> RouteObject (react-router) */
 const toRouteObject = ({ path, component, children }: AppRoute): RouteObject => ({
@@ -180,15 +202,18 @@ const toRouteObject = ({ path, component, children }: AppRoute): RouteObject => 
   children: children?.map(toRouteObject),
 });
 
+
 /** Login qilganlarni login sahifasiga kiritmaydigan route (PublicOnly guard bilan) */
 const toPublicRouteObject = (route: AppRoute): RouteObject => {
   const routeObject = toRouteObject(route);
   return { ...routeObject, element: <PublicOnly>{routeObject.element}</PublicOnly> };
 };
 
+
 /* ------------------------------------------------------------------ */
-/*  Router                                                             */
+/*  Router                                                            */
 /* ------------------------------------------------------------------ */
+
 
 export const router = createBrowserRouter([
   // Ochiq (auth) routelar - login qilingan bo'lsa dashboardga qaytaradi
@@ -209,5 +234,5 @@ export const router = createBrowserRouter([
   },
 ]);
 
-export default router;
 
+export default router;
