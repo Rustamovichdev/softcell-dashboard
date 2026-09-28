@@ -114,6 +114,18 @@ export const appRoutes: AppRoute[] = [
     component: lazy(() => import("../pages/dashboard/Payment")),
   },
   {
+    path: "/payment/new",
+    component: lazy(() => import("../pages/dashboard/Payment/PaymentFormPage")),
+  },
+  {
+    path: "/payment/:id",
+    component: lazy(() => import("../pages/dashboard/Payment/PaymentDetailPage")),
+  },
+  {
+    path: "/payment/:id/edit",
+    component: lazy(() => import("../pages/dashboard/Payment/PaymentEditPage")),
+  },
+  {
     path: "/results",
     label: "Results",
     icon: "results",
