@@ -26,6 +26,7 @@ export const usePaymentsStore = create<PaymentsState>()(
               {
                 id: nextId,
                 ...values,
+                dueDate: values.dueDate || new Date().toISOString(),
                 paidAt: values.status === "completed" ? new Date().toISOString() : "",
                 createdAt: new Date().toISOString(),
               },
@@ -42,6 +43,11 @@ export const usePaymentsStore = create<PaymentsState>()(
           payments: state.payments.filter((p) => p.id !== id),
         })),
     }),
-    { name: "payments-storage" },
+    {
+      name: "payments-storage",
+      // Eski mock ma'lumotlar lokal storage'dan tozalanadi
+      version: 3,
+      migrate: () => ({ payments: MOCK_PAYMENTS }),
+    },
   ),
 );

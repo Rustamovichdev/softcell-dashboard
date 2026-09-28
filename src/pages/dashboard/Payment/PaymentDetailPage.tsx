@@ -134,6 +134,10 @@ const PaymentDetailPage: FC = () => {
           <p className="text-xs text-gray-500">To'lov usuli</p>
           <p className="mt-1 text-sm font-medium text-gray-900">{methodLabels[payment.method]}</p>
         </div>
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs text-gray-500">Oy</p>
+          <p className="mt-1 text-sm font-medium text-gray-900">{payment.month}-oy / {payment.totalMonths} oy</p>
+        </div>
       </div>
 
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 mb-6">
@@ -149,6 +153,10 @@ const PaymentDetailPage: FC = () => {
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
           <p className="text-xs text-gray-500">To'langan sana</p>
           <p className="mt-1 text-sm text-gray-900">{formatDate(payment.paidAt)}</p>
+        </div>
+        <div className="rounded-lg border border-gray-200 bg-blue-50 p-4">
+          <p className="text-xs text-blue-700">To'lov muddati</p>
+          <p className="mt-1 text-sm text-blue-900">{formatDate(payment.dueDate)}</p>
         </div>
       </div>
     </section>
