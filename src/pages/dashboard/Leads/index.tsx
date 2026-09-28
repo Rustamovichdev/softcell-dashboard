@@ -181,7 +181,7 @@ const INITIAL_LEADS: Lead[] = [
   {
     id: 24,
     email: "ozoda24@gmail.com",
-    phone: "+998 94 169 33 43",
+    phone: "+998 94 169 35 43",
     address: "Shayxontohur tumani",
     source: "dost",
   },
