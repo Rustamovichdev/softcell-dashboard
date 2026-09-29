@@ -46,17 +46,20 @@ const monthDotStyles: Record<PaymentStatus, string> = {
 
 const PaymentSchedulePage: FC = () => {
   const navigate = useNavigate();
-  const payments = usePaymentsStore((state) => state.payments);
+  const payments = usePaymentsStore((state) => state.payments) ?? [];
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const rows = useMemo<StudentRow[]>(() => {
     const byStudent = new Map<number, Payment[]>();
-    payments.forEach((payment) => {
-      const list = byStudent.get(payment.studentId) ?? [];
-      list.push(payment);
-      byStudent.set(payment.studentId, list);
-    });
+    payments
+      // Noto'g'ri (keshdan qolgan) qatorlarni chiqib tashlaymiz
+      .filter((p) => p && p.studentId != null && p.lessonName && p.currency)
+      .forEach((payment) => {
+        const list = byStudent.get(payment.studentId) ?? [];
+        list.push(payment);
+        byStudent.set(payment.studentId, list);
+      });
 
     return Array.from(byStudent.entries()).map(([studentId, list]) => {
       const months = [...list].sort((a, b) => a.month - b.month);
@@ -93,7 +96,7 @@ const PaymentSchedulePage: FC = () => {
     if (!query) return rows;
     return rows.filter((row) =>
       [row.studentName, row.lessonName, row.groupName].some((v) =>
-        v.toLowerCase().includes(query),
+        v?.toLowerCase().includes(query),
       ),
     );
   }, [rows, search]);
