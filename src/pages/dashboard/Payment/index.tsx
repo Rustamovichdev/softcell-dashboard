@@ -8,7 +8,7 @@ import { usePaymentsStore } from "./store";
 
 const Payment: FC = () => {
   const navigate = useNavigate();
-  const payments = usePaymentsStore((state) => state.payments);
+  const payments = usePaymentsStore((state) => state.payments) ?? [];
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
@@ -40,15 +40,15 @@ const Payment: FC = () => {
   const visibleStudents = students.slice(startIndex, startIndex + PAGE_SIZE);
 
   const totalAmount = useMemo(
-    () => payments.reduce((sum, p) => sum + p.amount, 0),
+    () => payments.reduce((sum, p) => sum + (p.amount ?? 0), 0),
     [payments],
   );
   const totalPaid = useMemo(
-    () => payments.filter((p) => p.status === "completed").reduce((sum, p) => sum + p.paidAmount, 0),
+    () => payments.filter((p) => p.status === "completed").reduce((sum, p) => sum + (p.paidAmount ?? 0), 0),
     [payments],
   );
   const totalPending = useMemo(
-    () => payments.filter((p) => p.status === "pending").reduce((sum, p) => sum + p.dueAmount, 0),
+    () => payments.filter((p) => p.status === "pending").reduce((sum, p) => sum + (p.dueAmount ?? 0), 0),
     [payments],
   );
 

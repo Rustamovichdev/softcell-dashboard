@@ -45,8 +45,9 @@ export const usePaymentsStore = create<PaymentsState>()(
     }),
     {
       name: "payments-storage",
-      // Eski mock ma'lumotlar lokal storage'dan tozalanadi
-      version: 3,
+      // Bu mock ma'lumot - lokal storage'dagi eski/nosoql versiyalar har doim
+      // yangi MOCK_PAYMENTS bilan almashtiriladi (chalg'itilgan JSON ham).
+      version: 4,
       migrate: () => ({ payments: MOCK_PAYMENTS }),
     },
   ),

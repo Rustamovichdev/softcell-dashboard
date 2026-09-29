@@ -59,11 +59,14 @@ const statusLabels: Record<PaymentStatus, string> = {
 /** To'lovlarni o'quvchilar bo'yicha jamlaydi (ismi faqat bir marta chiqadi) */
 export const groupByStudent = (payments: Payment[]): StudentSummary[] => {
   const map = new Map<number, Payment[]>();
-  payments.forEach((payment) => {
-    const list = map.get(payment.studentId) ?? [];
-    list.push(payment);
-    map.set(payment.studentId, list);
-  });
+  payments
+    // Noto'g'ri (keshdan qolgan) qatorlarni chiqib tashlaymiz
+    .filter((p) => p && p.studentId != null && p.lessonName && p.currency)
+    .forEach((payment) => {
+      const list = map.get(payment.studentId) ?? [];
+      list.push(payment);
+      map.set(payment.studentId, list);
+    });
 
   return Array.from(map.entries()).map(([studentId, list]) => {
     const months = [...list].sort((a, b) => a.month - b.month);
