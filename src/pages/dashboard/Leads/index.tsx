@@ -1,198 +1,56 @@
 import { useMemo, useRef, useState, type FormEvent } from "react";
 
-type SourceKey = "ozi" | "internet" | "dost";
-
 type Lead = {
   id: number;
-  email: string;
+  fullName: string;
+  age: string; // yosh yoki maktabda nechanchi sinf
+  direction: string;
+  startUp: string;
+  startUpDesc: string;
   phone: string;
-  address: string;
-  source: SourceKey;
-};
-
-const SOURCE_LABELS: Record<SourceKey, string> = {
-  ozi: "O'zi kelgani",
-  internet: "Internetdan eshitgani",
-  dost: "Do'stidan eshitgani",
+  telegram: string;
 };
 
 const INITIAL_LEADS: Lead[] = [
   {
     id: 1,
-    email: "abdulaziz1@gmail.com",
+    fullName: "Abdulaziz Karimov",
+    age: "16 yosh",
+    direction: "Frontend",
+    startUp: "EduTrack",
+    startUpDesc: "O'quvchilar davomatini kuzatish ilovasi",
     phone: "+998 91 100 10 20",
-    address: "Chilonzor tumani",
-    source: "ozi",
+    telegram: "https://t.me/abdulaziz",
   },
   {
     id: 2,
-    email: "malika2@gmail.com",
+    fullName: "Malika Rahimova",
+    age: "9-sinf",
+    direction: "Python",
+    startUp: "StudyBot",
+    startUpDesc: "Dars tayyorlashda yordam beradigan Telegram bot",
     phone: "+998 92 103 11 21",
-    address: "Yunusobod tumani",
-    source: "internet",
+    telegram: "https://t.me/malika",
   },
   {
     id: 3,
-    email: "jasur3@gmail.com",
+    fullName: "Jasur Toshmatov",
+    age: "18 yosh",
+    direction: "Backend",
+    startUp: "FoodGo",
+    startUpDesc: "Yaqin atrofdagi oshxonalardan buyurtma berish xizmati",
     phone: "+998 93 106 12 22",
-    address: "Mirzo Ulug'bek tumani",
-    source: "dost",
-  },
-  {
-    id: 4,
-    email: "dilnoza4@gmail.com",
-    phone: "+998 94 109 13 23",
-    address: "Shayxontohur tumani",
-    source: "ozi",
-  },
-  {
-    id: 5,
-    email: "sardor5@gmail.com",
-    phone: "+998 95 112 14 24",
-    address: "Yashnobod tumani",
-    source: "internet",
-  },
-  {
-    id: 6,
-    email: "nodira6@gmail.com",
-    phone: "+998 91 115 15 25",
-    address: "Sergeli tumani",
-    source: "dost",
-  },
-  {
-    id: 7,
-    email: "bekzod7@gmail.com",
-    phone: "+998 92 118 16 26",
-    address: "Bektemir tumani",
-    source: "ozi",
-  },
-  {
-    id: 8,
-    email: "zarina8@gmail.com",
-    phone: "+998 93 121 17 27",
-    address: "Uchtepa tumani",
-    source: "internet",
-  },
-  {
-    id: 9,
-    email: "otabek9@gmail.com",
-    phone: "+998 94 124 18 28",
-    address: "Yakkasaroy tumani",
-    source: "dost",
-  },
-  {
-    id: 10,
-    email: "madina10@gmail.com",
-    phone: "+998 95 127 19 29",
-    address: "Olmazor tumani",
-    source: "ozi",
-  },
-  {
-    id: 11,
-    email: "shohruh11@gmail.com",
-    phone: "+998 91 130 20 30",
-    address: "Chilonzor tumani",
-    source: "internet",
-  },
-  {
-    id: 12,
-    email: "gulnora12@gmail.com",
-    phone: "+998 92 133 21 31",
-    address: "Yunusobod tumani",
-    source: "dost",
-  },
-  {
-    id: 13,
-    email: "farrux13@gmail.com",
-    phone: "+998 93 136 22 32",
-    address: "Mirzo Ulug'bek tumani",
-    source: "ozi",
-  },
-  {
-    id: 14,
-    email: "sevara14@gmail.com",
-    phone: "+998 94 139 23 33",
-    address: "Shayxontohur tumani",
-    source: "internet",
-  },
-  {
-    id: 15,
-    email: "ilyos15@gmail.com",
-    phone: "+998 95 142 24 34",
-    address: "Yashnobod tumani",
-    source: "dost",
-  },
-  {
-    id: 16,
-    email: "nigora16@gmail.com",
-    phone: "+998 91 145 25 35",
-    address: "Sergeli tumani",
-    source: "ozi",
-  },
-  {
-    id: 17,
-    email: "ravshan17@gmail.com",
-    phone: "+998 92 148 26 36",
-    address: "Bektemir tumani",
-    source: "internet",
-  },
-  {
-    id: 18,
-    email: "kamola18@gmail.com",
-    phone: "+998 93 151 27 37",
-    address: "Uchtepa tumani",
-    source: "dost",
-  },
-  {
-    id: 19,
-    email: "diyorbek19@gmail.com",
-    phone: "+998 94 154 28 38",
-    address: "Yakkasaroy tumani",
-    source: "ozi",
-  },
-  {
-    id: 20,
-    email: "feruza20@gmail.com",
-    phone: "+998 95 157 29 39",
-    address: "Olmazor tumani",
-    source: "internet",
-  },
-  {
-    id: 21,
-    email: "jamshid21@gmail.com",
-    phone: "+998 91 160 30 40",
-    address: "Chilonzor tumani",
-    source: "dost",
-  },
-  {
-    id: 22,
-    email: "laylo22@gmail.com",
-    phone: "+998 92 163 31 41",
-    address: "Yunusobod tumani",
-    source: "ozi",
-  },
-  {
-    id: 23,
-    email: "rustam23@gmail.com",
-    phone: "+998 93 166 32 42",
-    address: "Mirzo Ulug'bek tumani",
-    source: "internet",
-  },
-  {
-    id: 24,
-    email: "ozoda24@gmail.com",
-    phone: "+998 94 169 35 43",
-    address: "Shayxontohur tumani",
-    source: "dost",
-  },
-  {
-    id: 25,
-    email: "shahzod25@gmail.com",
-    phone: "+998 95 172 34 44",
-    address: "Yashnobod tumani",
-    source: "ozi",
+    telegram: "https://t.me/jasur",
   },
 ];
+
+const normalizeTelegram = (value: string) => {
+  const v = value.trim();
+  if (/^https?:\/\//i.test(v)) return v;
+  if (v.startsWith("@")) return `https://t.me/${v.slice(1)}`;
+  if (v.startsWith("t.me/")) return `https://${v}`;
+  return `https://t.me/${v}`;
+};
 
 const PAGE_SIZE = 5;
 
@@ -202,10 +60,13 @@ const Leads = () => {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
 
-  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [age, setAge] = useState("");
+  const [direction, setDirection] = useState("");
+  const [startUp, setStartUp] = useState("");
+  const [startUpDesc, setStartUpDesc] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [source, setSource] = useState<SourceKey>("ozi");
+  const [telegram, setTelegram] = useState("");
 
   // Bir marta yuborishni ta'minlaydi (ikki marta bosishdan himoya)
   const submittedRef = useRef(false);
@@ -216,9 +77,13 @@ const Leads = () => {
     if (!q) return leads;
     return leads.filter(
       (lead) =>
-        lead.email.toLowerCase().includes(q) ||
+        lead.fullName.toLowerCase().includes(q) ||
+        lead.age.toLowerCase().includes(q) ||
+        lead.direction.toLowerCase().includes(q) ||
+        lead.startUp.toLowerCase().includes(q) ||
+        lead.startUpDesc.toLowerCase().includes(q) ||
         lead.phone.toLowerCase().includes(q) ||
-        lead.address.toLowerCase().includes(q)
+        lead.telegram.toLowerCase().includes(q)
     );
   }, [leads, query]);
 
@@ -230,10 +95,13 @@ const Leads = () => {
   );
 
   const openForm = () => {
-    setEmail("");
+    setFullName("");
+    setAge("");
+    setDirection("");
+    setStartUp("");
+    setStartUpDesc("");
     setPhone("");
-    setAddress("");
-    setSource("ozi");
+    setTelegram("");
     submittedRef.current = false;
     setSubmitted(false);
     setOpen(true);
@@ -249,7 +117,16 @@ const Leads = () => {
 
     setLeads((prev) => [
       ...prev,
-      { id: Date.now(), email, phone, address, source },
+      {
+        id: Date.now(),
+        fullName,
+        age,
+        direction,
+        startUp,
+        startUpDesc,
+        phone,
+        telegram: normalizeTelegram(telegram),
+      },
     ]);
     setQuery("");
     setPage(1);
@@ -354,7 +231,7 @@ const Leads = () => {
 
         .leads__table {
           width: 100%;
-          min-width: 640px;
+          min-width: 1000px;
           border-collapse: collapse;
         }
 
@@ -367,6 +244,7 @@ const Leads = () => {
           padding: 14px 20px;
           text-align: left;
           font-size: 14px;
+          vertical-align: top;
         }
 
         .leads__table th {
@@ -376,6 +254,7 @@ const Leads = () => {
           text-transform: uppercase;
           color: #6b7280;
           border-bottom: 1px solid #eef0f2;
+          white-space: nowrap;
         }
 
         .leads__table tbody tr {
@@ -392,6 +271,28 @@ const Leads = () => {
 
         .leads__table td:nth-child(2) {
           font-weight: 600;
+        }
+
+        .leads__table td:nth-child(5) {
+          min-width: 220px;
+          color: #4b5563;
+        }
+
+        .leads__table a {
+          color: #2563eb;
+          text-decoration: none;
+        }
+
+        .leads__table a:hover {
+          text-decoration: underline;
+        }
+
+        .leads__age {
+          display: block;
+          color: #6b7280;
+          font-size: 12px;
+          font-weight: 400;
+          margin-top: 2px;
         }
 
         .leads__pagination {
@@ -454,11 +355,14 @@ const Leads = () => {
           display: flex;
           flex-wrap: wrap;
           gap: 24px;
-          width: 50vw;
-          max-width: 50vw;
+          width: 60vw;
+          max-width: 60vw;
+          max-height: 90vh;
+          overflow-y: auto;
           background: #fff;
           border-radius: 12px;
           padding: 28px;
+          box-sizing: border-box;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
@@ -487,13 +391,13 @@ const Leads = () => {
 
         .leads__left,
         .leads__right {
-          flex: 1 1 220px;
+          flex: 1 1 260px;
           display: flex;
           flex-direction: column;
           gap: 14px;
         }
 
-        .leads__form input[type="email"],
+        .leads__form input[type="text"],
         .leads__form input[type="tel"],
         .leads__form textarea {
           border: 1px solid #d1d5db;
@@ -505,7 +409,7 @@ const Leads = () => {
           transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .leads__form input[type="email"]:focus,
+        .leads__form input[type="text"]:focus,
         .leads__form input[type="tel"]:focus,
         .leads__form textarea:focus {
           border-color: #111827;
@@ -513,30 +417,8 @@ const Leads = () => {
         }
 
         .leads__form textarea {
-          min-height: 80px;
+          min-height: 100px;
           resize: vertical;
-        }
-
-        .leads__sources {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .leads__radio {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 14px;
-          color: #374151;
-          cursor: pointer;
-        }
-
-        .leads__radio input[type="radio"] {
-          accent-color: #111827;
-          width: 16px;
-          height: 16px;
-          cursor: pointer;
         }
 
         .leads__submit {
@@ -575,6 +457,11 @@ const Leads = () => {
             padding: 10px 14px;
             font-size: 13px;
           }
+
+          .leads__form {
+            width: 90vw;
+            max-width: 90vw;
+          }
         }
 
         @media (max-width: 480px) {
@@ -597,8 +484,6 @@ const Leads = () => {
             padding: 20px;
             width: 100%;
             max-width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
           }
 
           .leads__submit {
@@ -618,7 +503,7 @@ const Leads = () => {
           </svg>
           <input
             type="text"
-            placeholder="Email, telefon yoki manzil bo'yicha qidirish..."
+            placeholder="Ism, yo'nalish, startUp yoki telefon bo'yicha qidirish..."
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -639,21 +524,32 @@ const Leads = () => {
             <table className="leads__table">
               <thead>
                 <tr>
-                  <th>№</th>
-                  <th>Email</th>
-                  <th>Telefon</th>
-                  <th>Qayerdan ekanligi</th>
-                  <th>Qayerdan bilgan</th>
+                  <th>ID</th>
+                  <th>Lead full name</th>
+                  <th>Direction</th>
+                  <th>StartUp</th>
+                  <th>StartUp desc</th>
+                  <th>Tel number</th>
+                  <th>Telegram link</th>
                 </tr>
               </thead>
               <tbody>
                 {pageLeads.map((lead, i) => (
                   <tr key={lead.id}>
                     <td>{(currentPage - 1) * PAGE_SIZE + i + 1}</td>
-                    <td>{lead.email}</td>
+                    <td>
+                      {lead.fullName}
+                      <span className="leads__age">{lead.age}</span>
+                    </td>
+                    <td>{lead.direction}</td>
+                    <td>{lead.startUp}</td>
+                    <td>{lead.startUpDesc}</td>
                     <td>{lead.phone}</td>
-                    <td>{lead.address}</td>
-                    <td>{SOURCE_LABELS[lead.source]}</td>
+                    <td>
+                      <a href={lead.telegram} target="_blank" rel="noreferrer">
+                        {lead.telegram}
+                      </a>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -714,10 +610,24 @@ const Leads = () => {
 
             <div className="leads__left">
               <input
-                type="email"
-                placeholder="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="Ism familya"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Yosh (yoki maktabda nechanchi sinf)"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Yo'nalish (qaysi yo'nalishga qiziqyapti)"
+                value={direction}
+                onChange={(e) => setDirection(e.target.value)}
                 required
               />
               <input
@@ -747,29 +657,29 @@ const Leads = () => {
                 }}
                 required
               />
-              <textarea
-                placeholder="qayerdan ekanligi"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                required
-              />
             </div>
 
             <div className="leads__right">
-              <div className="leads__sources">
-                {(Object.keys(SOURCE_LABELS) as SourceKey[]).map((key) => (
-                  <label key={key} className="leads__radio">
-                    <input
-                      type="radio"
-                      name="source"
-                      value={key}
-                      checked={source === key}
-                      onChange={() => setSource(key)}
-                    />
-                    <span>{SOURCE_LABELS[key]}</span>
-                  </label>
-                ))}
-              </div>
+              <input
+                type="text"
+                placeholder="StartUp nomi"
+                value={startUp}
+                onChange={(e) => setStartUp(e.target.value)}
+                required
+              />
+              <textarea
+                placeholder="StartUp haqida qisqacha yozing"
+                value={startUpDesc}
+                onChange={(e) => setStartUpDesc(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Telegram (@username yoki link)"
+                value={telegram}
+                onChange={(e) => setTelegram(e.target.value)}
+                required
+              />
 
               <button
                 type="submit"
