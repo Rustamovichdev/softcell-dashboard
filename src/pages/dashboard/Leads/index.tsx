@@ -490,6 +490,34 @@ const Leads = () => {
             width: 100%;
           }
         }
+
+
+        
+
+
+
+
+        .leads__form {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 60vw;
+  max-width: 60vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.leads__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
       `}</style>
 
       <h1 className="leads__title">O'quvchilar ro'yxati</h1>
@@ -607,7 +635,17 @@ const Leads = () => {
               onClick={closeForm}
               aria-label="Yopish"
             />
+<h2 className="leads__form-title">Ma'lumotlarni qo'shish</h2>
 
+<div className="leads__fields">
+  <div className="leads__left">
+    {/* ... chap tarafdagi inputlar o'zgarishsiz ... */}
+  </div>
+
+  <div className="leads__right">
+    {/* ... o'ng tarafdagi inputlar va "Kiritish" tugmasi o'zgarishsiz ... */}
+  </div>
+</div>
             <div className="leads__left">
               <input
                 type="text"
