@@ -6,13 +6,19 @@ import { PublicOnly, RequireAuth } from "../features/auth/guards";
 import AdminLayout from "../layout/AdminLayout";
 
 
+
+
 /* ------------------------------------------------------------------ */
 /*  Types                                                             */
 /* ------------------------------------------------------------------ */
 
 
+
+
 /** Tizimdagi foydalanuvchi rollari (keyinchalik to'ldiriladi) */
 export type UserRole = "admin" | "manager" | "teacher" | "student";
+
+
 
 
 /**
@@ -38,9 +44,13 @@ export type AppRoute = {
 };
 
 
+
+
 /* ------------------------------------------------------------------ */
 /*  Routes (data)                                                     */
 /* ------------------------------------------------------------------ */
+
+
 
 
 /** AdminLayout ichida ko'rinadigan routelar */
@@ -107,6 +117,16 @@ export const appRoutes: AppRoute[] = [
     component: lazy(() => import("../pages/dashboard/Directions")),
   },
   {
+    path: "/marketing",
+    label: "Marketing",
+    icon: "marketing",
+    component: lazy(() => import("../pages/dashboard/Marketing")),
+  },
+  {
+    path: "/marketing/new",
+    component: lazy(() => import("../pages/dashboard/Marketing/CampaignFormPage")),
+  },
+  {
     path: "/history",
     label: "History",
     icon: "history",
@@ -161,6 +181,8 @@ export const appRoutes: AppRoute[] = [
 ];
 
 
+
+
 /** Layoutsiz (auth) routelar */
 export const authRoutes: AppRoute[] = [
   {
@@ -171,9 +193,13 @@ export const authRoutes: AppRoute[] = [
 ];
 
 
+
+
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
+
+
 
 
 /**
@@ -188,11 +214,15 @@ export const getRoutesByRole = (
   routes.filter(({ roles }) => !roles?.length || (role !== undefined && roles.includes(role)));
 
 
+
+
 const withSuspense = (Component: LazyExoticComponent<ComponentType>) => (
   <Suspense fallback={<PageLoader />}>
     <Component />
   </Suspense>
 );
+
+
 
 
 /** AppRoute (data) -> RouteObject (react-router) */
@@ -203,6 +233,8 @@ const toRouteObject = ({ path, component, children }: AppRoute): RouteObject => 
 });
 
 
+
+
 /** Login qilganlarni login sahifasiga kiritmaydigan route (PublicOnly guard bilan) */
 const toPublicRouteObject = (route: AppRoute): RouteObject => {
   const routeObject = toRouteObject(route);
@@ -210,9 +242,13 @@ const toPublicRouteObject = (route: AppRoute): RouteObject => {
 };
 
 
+
+
 /* ------------------------------------------------------------------ */
 /*  Router                                                            */
 /* ------------------------------------------------------------------ */
+
+
 
 
 export const router = createBrowserRouter([
@@ -220,7 +256,7 @@ export const router = createBrowserRouter([
   ...authRoutes.map(toPublicRouteObject),
   {
     path: "/",
-    // Token bo'lmasa - /login ga yo'naltiradi
+    // Token bo'lsa - /login ga yo'naltiradi
     element: (
       <RequireAuth>
         <AdminLayout />
@@ -233,6 +269,8 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
+
+
 
 
 export default router;
