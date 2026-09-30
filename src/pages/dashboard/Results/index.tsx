@@ -11,49 +11,35 @@ type Student = {
   avatar: string;
 };
 
-const names = [
-  "abdulaziz", "malika", "jasur", "dilnoza", "sardor",
-  "madina", "bobur", "nodira", "otabek", "zilola",
-  "sherzod", "gulnora", "akmal", "shahlo", "eldor",
-  "feruza", "islom", "kamola", "lazizbek", "nigora",
-  "rustam", "sevara", "timur", "umida", "javohir",
+// O'z ma'lumotlaringizni shu yerga yozing.
+// Yangi o'quvchi qo'shish uchun { ... } blokni nusxalab, id ni o'zgartiring.
+const students: Student[] = [
+  { id: 1, email: "abdulaziz1@gmail.com", phone: "+998 90 123 45 67", district: "Chilonzor tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Portfolio sayti", avatar: "https://i.pravatar.cc/200?img=1" },
+  { id: 2, email: "malika2@gmail.com", phone: "+998 91 234 56 78", district: "Yunusobod tumani", source: "Internetdan eshitgani", course: "Python dasturlash", project: "Telegram bot (Python)", avatar: "https://i.pravatar.cc/200?img=2" },
+  { id: 3, email: "jasur3@gmail.com", phone: "+998 93 345 67 89", district: "Mirzo Ulug'bek tumani", source: "O'zi kelgani", course: "Backend (Node.js)", project: "Blog sayti (Node.js)", avatar: "https://i.pravatar.cc/200?img=3" },
+  { id: 4, email: "dilnoza4@gmail.com", phone: "+998 94 456 78 90", district: "Shayxontohur tumani", source: "Do'stidan eshitgani", course: "Grafik dizayn", project: "Do'kon veb-sayti (HTML, CSS)", avatar: "https://i.pravatar.cc/200?img=4" },
+  { id: 5, email: "sardor5@gmail.com", phone: "+998 95 567 89 01", district: "Yashnobod tumani", source: "Internetdan eshitgani", course: "Mobil ilovalar yaratish", project: "Ob-havo ilovasi (API bilan)", avatar: "https://i.pravatar.cc/200?img=5" },
+  { id: 6, email: "madina6@gmail.com", phone: "+998 97 678 90 12", district: "Olmazor tumani", source: "O'zi kelgani", course: "Kompyuter savodxonligi", project: "Kalkulyator dasturi (React)", avatar: "https://i.pravatar.cc/200?img=6" },
+  { id: 7, email: "bobur7@gmail.com", phone: "+998 98 789 01 23", district: "Sergeli tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Tik-Tak-Toe o'yini (JavaScript)", avatar: "https://i.pravatar.cc/200?img=7" },
+  { id: 8, email: "nodira8@gmail.com", phone: "+998 99 890 12 34", district: "Uchtepa tumani", source: "Internetdan eshitgani", course: "Python dasturlash", project: "Vazifalar ro'yxati (To-Do) ilovasi", avatar: "https://i.pravatar.cc/200?img=8" },
+  { id: 9, email: "otabek9@gmail.com", phone: "+998 90 901 23 45", district: "Yakkasaroy tumani", source: "O'zi kelgani", course: "Backend (Node.js)", project: "Blog sayti (Node.js)", avatar: "https://i.pravatar.cc/200?img=9" },
+  { id: 10, email: "zilola10@gmail.com", phone: "+998 91 012 34 56", district: "Mirobod tumani", source: "Do'stidan eshitgani", course: "Grafik dizayn", project: "Portfolio sayti", avatar: "https://i.pravatar.cc/200?img=10" },
+  { id: 11, email: "sherzod11@gmail.com", phone: "+998 93 111 22 33", district: "Bektemir tumani", source: "Internetdan eshitgani", course: "Mobil ilovalar yaratish", project: "Kalkulyator dasturi (React)", avatar: "https://i.pravatar.cc/200?img=11" },
+  { id: 12, email: "gulnora12@gmail.com", phone: "+998 94 222 33 44", district: "Yangihayot tumani", source: "O'zi kelgani", course: "Kompyuter savodxonligi", project: "Do'kon veb-sayti (HTML, CSS)", avatar: "https://i.pravatar.cc/200?img=12" },
+  { id: 13, email: "akmal13@gmail.com", phone: "+998 95 333 44 55", district: "Chilonzor tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Ob-havo ilovasi (API bilan)", avatar: "https://i.pravatar.cc/200?img=13" },
+  { id: 14, email: "shahlo14@gmail.com", phone: "+998 97 444 55 66", district: "Yunusobod tumani", source: "Internetdan eshitgani", course: "Python dasturlash", project: "Telegram bot (Python)", avatar: "https://i.pravatar.cc/200?img=14" },
+  { id: 15, email: "eldor15@gmail.com", phone: "+998 98 555 66 77", district: "Mirzo Ulug'bek tumani", source: "O'zi kelgani", course: "Backend (Node.js)", project: "Vazifalar ro'yxati (To-Do) ilovasi", avatar: "https://i.pravatar.cc/200?img=15" },
+  { id: 16, email: "feruza16@gmail.com", phone: "+998 99 666 77 88", district: "Shayxontohur tumani", source: "Do'stidan eshitgani", course: "Grafik dizayn", project: "Portfolio sayti", avatar: "https://i.pravatar.cc/200?img=16" },
+  { id: 17, email: "islom17@gmail.com", phone: "+998 90 777 88 99", district: "Yashnobod tumani", source: "Internetdan eshitgani", course: "Mobil ilovalar yaratish", project: "Tik-Tak-Toe o'yini (JavaScript)", avatar: "https://i.pravatar.cc/200?img=17" },
+  { id: 18, email: "kamola18@gmail.com", phone: "+998 91 888 99 00", district: "Olmazor tumani", source: "O'zi kelgani", course: "Kompyuter savodxonligi", project: "Kalkulyator dasturi (React)", avatar: "https://i.pravatar.cc/200?img=18" },
+  { id: 19, email: "lazizbek19@gmail.com", phone: "+998 93 999 00 11", district: "Sergeli tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Do'kon veb-sayti (HTML, CSS)", avatar: "https://i.pravatar.cc/200?img=19" },
+  { id: 20, email: "nigora20@gmail.com", phone: "+998 94 100 20 30", district: "Uchtepa tumani", source: "Internetdan eshitgani", course: "Python dasturlash", project: "Ob-havo ilovasi (API bilan)", avatar: "https://i.pravatar.cc/200?img=20" },
+  { id: 21, email: "rustam21@gmail.com", phone: "+998 95 200 30 40", district: "Yakkasaroy tumani", source: "O'zi kelgani", course: "Backend (Node.js)", project: "Blog sayti (Node.js)", avatar: "https://i.pravatar.cc/200?img=21" },
+  { id: 22, email: "sevara22@gmail.com", phone: "+998 97 300 40 50", district: "Mirobod tumani", source: "Do'stidan eshitgani", course: "Grafik dizayn", project: "Portfolio sayti", avatar: "https://i.pravatar.cc/200?img=22" },
+  { id: 23, email: "timur23@gmail.com", phone: "+998 98 400 50 60", district: "Bektemir tumani", source: "Internetdan eshitgani", course: "Mobil ilovalar yaratish", project: "Vazifalar ro'yxati (To-Do) ilovasi", avatar: "https://i.pravatar.cc/200?img=23" },
+  { id: 24, email: "umida24@gmail.com", phone: "+998 99 500 60 70", district: "Yangihayot tumani", source: "O'zi kelgani", course: "Kompyuter savodxonligi", project: "Tik-Tak-Toe o'yini (JavaScript)", avatar: "https://i.pravatar.cc/200?img=24" },
+  { id: 25, email: "javohir25@gmail.com", phone: "+998 90 600 70 80", district: "Chilonzor tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Telegram bot (Python)", avatar: "https://i.pravatar.cc/200?img=25" },
 ];
-const districts = [
-  "Chilonzor tumani", "Yunusobod tumani", "Mirzo Ulug'bek tumani",
-  "Shayxontohur tumani", "Yashnobod tumani", "Olmazor tumani",
-  "Sergeli tumani", "Uchtepa tumani", "Yakkasaroy tumani",
-  "Mirobod tumani", "Bektemir tumani", "Yangihayot tumani",
-];
-const sources = ["O'zi kelgani", "Internetdan eshitgani", "Do'stidan eshitgani"];
-const courses = [
-  "Frontend (HTML, CSS, JavaScript, React)",
-  "Backend (Node.js)",
-  "Python dasturlash",
-  "Kompyuter savodxonligi",
-  "Grafik dizayn",
-  "Mobil ilovalar yaratish",
-];
-const projects = [
-  "Kalkulyator dasturi (React)",
-  "Do'kon veb-sayti (HTML, CSS)",
-  "Vazifalar ro'yxati (To-Do) ilovasi",
-  "Telegram bot (Python)",
-  "Portfolio sayti",
-  "Ob-havo ilovasi (API bilan)",
-  "Tik-Tak-Toe o'yini (JavaScript)",
-  "Blog sayti (Node.js)",
-];
-
-const students: Student[] = names.map((n, i) => ({
-  id: i + 1,
-  email: `${n}${i + 1}@gmail.com`,
-  phone: `+998 ${91 + (i % 9)} ${100 + i * 3} ${10 + i} ${20 + i}`,
-  district: districts[i % districts.length],
-  source: sources[i % sources.length],
-  course: courses[i % courses.length],
-  project: projects[i % projects.length],
-  avatar: `https://i.pravatar.cc/200?img=${(i % 70) + 1}`,
-}));
 
 const styles = `
 .results {
@@ -63,7 +49,7 @@ const styles = `
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   box-sizing: border-box;
 }
-.results-wrap { max-width: 900px; margin: 0 auto; }
+.results-wrap { width: 100%; }
 .results-title { margin: 0 0 20px; font-size: 28px; color: #0f172a; }
 
 .results-top {
