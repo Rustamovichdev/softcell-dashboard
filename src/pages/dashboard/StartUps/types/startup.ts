@@ -12,13 +12,21 @@ export interface Startup {
   studentPhone: string;
   group: string;
 
-  title: string;
+  startupName: string;
   topic: string;
-  goal: string;
 
-  deadline: string;
+  goal: string;
+  description: string;
+
+  projectLink: string;
+  demoLink: string;
+
+  submissionDate: string;
 
   status: StartupStatus;
 
-  adminComment: string;
+  mentorName?: string;
+  mentorComment?: string;
+
+  createdAt: string;
 }
