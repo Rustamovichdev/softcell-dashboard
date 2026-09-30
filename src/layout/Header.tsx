@@ -88,7 +88,7 @@ const Header: FC<HeaderProps> = ({ onMenuClick }) => {
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   };
-
+    <header className="sticky top-0 z-20 flex h-16 items-center gap-1.5 border-b border-gray-200 bg-white px-3 dark:border-gray-800 dark:bg-gray-900 sm:gap-3 sm:px-4 lg:px-6"></header>
 
   const handleLanguageChange = (value: Language) => {
     setLanguage(value);

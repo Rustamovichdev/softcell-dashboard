@@ -17,6 +17,9 @@ export const DASHBOARD_ROUTE = "/dashboard";
 /** Auth (token + user) shu kalit bilan saqlanadi */
 export const AUTH_STORAGE_KEY = "dashboard:auth";
 
+export const THEME_STORAGE_KEY = "dashboard:theme";
+export const TEXT_SIZE_STORAGE_KEY = "dashboard:text-size";
+
 /** Header'dagi tillar */
 export const LANGUAGES: { value: Language; label: string }[] = [
   { value: "uz", label: "UZB" },
