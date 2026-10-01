@@ -1,16 +1,25 @@
-// Barcha turlar (types) shu faylda saqlanadi.
-
 export type Period = "day" | "week" | "month" | "year";
 
 export interface Stat {
   key: string;
-  label: string;   // kartochka nomi
-  value: number;   // qiymati
-  money?: boolean; // true bo'lsa so'mda formatlanadi
-  hint?: string;   // pastda kichik izoh
+  label: string;
+  value: number;
+  money?: boolean;
+  hint?: string;
 }
 
 export interface ChartPoint {
-  label: string;   // masalan "Dush"
-  value: number;   // masalan 14
+  label: string;
+  value: number;
+}
+
+export type LeadStatus = "yangi" | "aloqada" | "qabul_qilindi" | "bekor_qilindi";
+
+export interface RecentLead {
+  id: string;
+  name: string;
+  phone: string;
+  direction: string;
+  createdAt: string;
+  status: LeadStatus;
 }
