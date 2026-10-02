@@ -490,6 +490,25 @@ const Leads = () => {
             width: 100%;
           }
         }
+.modal-content {
+  display: block;      /* yonma-yon emas, tepadan pastga */
+  width: 100%;
+}
+
+.form-title {
+  display: block;
+  width: 100%;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+        
       `}</style>
 
       <h1 className="leads__title">O'quvchilar ro'yxati</h1>
@@ -607,7 +626,13 @@ const Leads = () => {
               onClick={closeForm}
               aria-label="Yopish"
             />
+     <div className="modal-content">
+  <h2 className="form-title">Ma'lumotlarni kiriting</h2>
 
+  <form className="form-grid">
+    {/* barcha inputlar va "Kiritish" tugmasi shu yerda */}
+  </form>
+</div>
             <div className="leads__left">
               <input
                 type="text"
