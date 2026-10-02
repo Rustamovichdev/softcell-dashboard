@@ -1,162 +1,286 @@
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  ExternalLink,
+  XCircle,
+} from "lucide-react";
 
-import type { Startup } from "../types/startup";
+import { useState } from "react";
+
+import type {
+  Startup,
+  StartupStatus,
+} from "../types/startup";
+
 import StartupStatusBadge from "./StartupStatusBadge";
 
 interface Props {
   startup: Startup;
+
   onClose: () => void;
+
+  onUpdate?: (
+    status: StartupStatus,
+    mentorComment?: string,
+  ) => void;
 }
 
 export default function StartupDetail({
   startup,
   onClose,
+  onUpdate,
 }: Props) {
+  const [comment, setComment] = useState(
+    startup.mentorComment ?? "",
+  );
+
+  const [showRevision, setShowRevision] =
+    useState(false);
+
+  const handleApprove = () => {
+    onUpdate?.(
+      "approved",
+      comment.trim() ||
+        "Loyiha mentor tomonidan tasdiqlandi.",
+    );
+
+    onClose();
+  };
+
+  const handleRevision = () => {
+    if (!comment.trim()) {
+      return;
+    }
+
+    onUpdate?.("revision", comment.trim());
+
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 p-4">
-      <div className="mx-auto mt-8 max-w-4xl rounded-2xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-5">
-          <div>
-            <p className="text-sm text-gray-500">
-              Startup loyihasi
-            </p>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="mx-auto max-w-5xl">
+        <button
+          type="button"
+          onClick={onClose}
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900"
+        >
+          <ArrowLeft size={17} />
+          Orqaga
+        </button>
 
-            <h2 className="mt-1 text-2xl font-bold text-gray-900">
-              {startup.startupName}
-            </h2>
-          </div>
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          {/* HEADER */}
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
-          >
-            Yopish
-          </button>
-        </div>
+          <div className="flex flex-col gap-4 border-b border-gray-200 p-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm text-gray-500">
+                Startup loyihasi
+              </p>
 
-        <div className="space-y-6 p-6">
-          <div className="rounded-xl border border-gray-200 p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">
-                O'quvchi
-              </h3>
-
-              <StartupStatusBadge status={startup.status} />
+              <h1 className="mt-1 text-2xl font-bold text-gray-900">
+                {startup.startupName}
+              </h1>
             </div>
 
-            <p className="font-medium text-gray-900">
-              {startup.studentName}
-            </p>
-
-            <p className="mt-1 text-sm text-gray-500">
-              {startup.group}
-            </p>
-
-            <p className="mt-1 text-sm text-gray-500">
-              {startup.studentPhone}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <Info
-              title="Mavzu"
-              value={startup.topic}
-            />
-
-            <Info
-              title="Topshirish sanasi"
-              value={new Date(
-                startup.submissionDate,
-              ).toLocaleDateString("uz-UZ")}
+            <StartupStatusBadge
+              status={startup.status}
             />
           </div>
 
-          <section>
-            <h3 className="font-semibold text-gray-900">
-              Startup maqsadi
-            </h3>
+          <div className="space-y-6 p-6">
+            {/* O'QUVCHI */}
 
-            <p className="mt-2 leading-6 text-gray-600">
-              {startup.goal}
-            </p>
-          </section>
+            <div className="rounded-xl border border-gray-200 p-5">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900">
+                O'quvchi
+              </h2>
 
-          <section>
-            <h3 className="font-semibold text-gray-900">
-              Loyiha haqida
-            </h3>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Ism
+                  </p>
 
-            <p className="mt-2 whitespace-pre-line leading-6 text-gray-600">
-              {startup.description}
-            </p>
-          </section>
+                  <p className="mt-1 font-semibold text-gray-900">
+                    {startup.studentName}
+                  </p>
+                </div>
 
-          <section>
-            <h3 className="font-semibold text-gray-900">
-              Loyiha havolalari
-            </h3>
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Telefon
+                  </p>
 
-            <div className="mt-3 flex flex-wrap gap-3">
-              {startup.projectLink && (
+                  <p className="mt-1 font-semibold text-gray-900">
+                    {startup.studentPhone}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-gray-500">
+                    Guruh
+                  </p>
+
+                  <p className="mt-1 font-semibold text-gray-900">
+                    {startup.group}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* MAVZU VA SANA */}
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-xl border border-gray-200 p-5">
+                <p className="text-xs text-gray-500">
+                  Mavzu / g'oya
+                </p>
+
+                <p className="mt-2 font-semibold text-gray-900">
+                  {startup.topic}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-gray-200 p-5">
+                <p className="text-xs text-gray-500">
+                  Topshirish sanasi
+                </p>
+
+                <p className="mt-2 font-semibold text-gray-900">
+                  {new Date(
+                    startup.submissionDate,
+                  ).toLocaleDateString("uz-UZ")}
+                </p>
+              </div>
+            </div>
+
+            {/* MAQSAD */}
+
+            <div>
+              <h2 className="mb-2 text-lg font-semibold text-gray-900">
+                Startup maqsadi
+              </h2>
+
+              <div className="rounded-xl bg-gray-50 p-5 text-sm leading-6 text-gray-700">
+                {startup.goal}
+              </div>
+            </div>
+
+            {/* LOYIHA */}
+
+            <div>
+              <h2 className="mb-2 text-lg font-semibold text-gray-900">
+                Loyiha haqida
+              </h2>
+
+              <div className="rounded-xl bg-gray-50 p-5 text-sm leading-6 text-gray-700">
+                {startup.description}
+              </div>
+            </div>
+
+            {/* LOYIHA LINKI */}
+
+            <div className="rounded-xl border border-gray-200 p-5">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    Loyiha havolasi
+                  </p>
+
+                  <p className="mt-1 break-all text-sm text-gray-500">
+                    {startup.projectLink}
+                  </p>
+                </div>
+
                 <a
                   href={startup.projectLink}
                   target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50"
-                >
-                  Project / GitHub
-                  <ExternalLink size={16} />
-                </a>
-              )}
-
-              {startup.demoLink && (
-                <a
-                  href={startup.demoLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50"
+                  rel="noopener noreferrer"
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
                 >
                   Loyihani ko'rish
                   <ExternalLink size={16} />
                 </a>
-              )}
+              </div>
             </div>
-          </section>
 
-          {startup.mentorComment && (
-            <section className="rounded-xl border border-yellow-200 bg-yellow-50 p-5">
-              <h3 className="font-semibold text-gray-900">
-                Mentor izohi
-              </h3>
+            {/* MENTOR */}
 
-              <p className="mt-2 text-sm leading-6 text-gray-700">
-                {startup.mentorComment}
-              </p>
-            </section>
-          )}
+            {onUpdate && (
+              <div className="border-t border-gray-200 pt-6">
+                <h2 className="mb-4 text-lg font-semibold text-gray-900">
+                  Mentor tekshiruvi
+                </h2>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    Mentor izohi
+                  </label>
+
+                  <textarea
+                    value={comment}
+                    onChange={(event) =>
+                      setComment(event.target.value)
+                    }
+                    rows={4}
+                    placeholder="Loyiha haqida izoh yoki qayta ishlash sababini yozing..."
+                    className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-gray-900"
+                  />
+                </div>
+
+                {showRevision && (
+                  <p className="mt-2 text-xs text-orange-600">
+                    Qayta ishlashga yuborish uchun sabab
+                    yozilishi kerak.
+                  </p>
+                )}
+
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={handleApprove}
+                    className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-700"
+                  >
+                    <CheckCircle2 size={17} />
+                    Tasdiqlash
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!comment.trim()) {
+                        setShowRevision(true);
+                        return;
+                      }
+
+                      handleRevision();
+                    }}
+                    className="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-600"
+                  >
+                    <XCircle size={17} />
+                    Qayta ishlashga yuborish
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* MENTOR OLDINGI IZOHI */}
+
+            {startup.mentorComment && !onUpdate && (
+              <div className="rounded-xl bg-gray-50 p-5">
+                <p className="text-sm font-semibold text-gray-900">
+                  Mentor izohi
+                </p>
+
+                <p className="mt-2 text-sm text-gray-600">
+                  {startup.mentorComment}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Info({
-  title,
-  value,
-}: {
-  title: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-xl border border-gray-200 p-4">
-      <p className="text-xs font-medium uppercase text-gray-500">
-        {title}
-      </p>
-
-      <p className="mt-2 text-sm font-medium text-gray-900">
-        {value}
-      </p>
     </div>
   );
 }

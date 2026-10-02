@@ -1,9 +1,9 @@
 export type StartupStatus =
-  | "idea"
+  | "draft"
   | "preparing"
   | "submitted"
-  | "approved"
-  | "revision";
+  | "revision"
+  | "approved";
 
 export interface Startup {
   id: string;
@@ -13,19 +13,23 @@ export interface Startup {
   group: string;
 
   startupName: string;
+
   topic: string;
 
   goal: string;
+
   description: string;
 
+  // Faqat loyiha linki.
+  // GitHub link ishlatilmaydi.
   projectLink: string;
-  demoLink: string;
 
   submissionDate: string;
 
   status: StartupStatus;
 
   mentorName?: string;
+
   mentorComment?: string;
 
   createdAt: string;
