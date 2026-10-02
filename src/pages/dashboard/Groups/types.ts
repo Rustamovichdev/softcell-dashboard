@@ -31,7 +31,6 @@ export type Group = {
   /** Dars vaqti, masalan "18:00" */
   time: string;
   startDate: string;
-  endDate: string;
   /** Guruh to'lovi (so'm) */
   payment: number;
   /** Jami darslar soni */

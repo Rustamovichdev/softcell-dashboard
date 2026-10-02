@@ -35,7 +35,6 @@ const GroupsTable: FC<GroupsTableProps> = ({ groups, startIndex, onOpenGroup }) 
           <th className="px-4 py-3 font-medium">Group name</th>
           <th className="px-4 py-3 font-medium">Direction</th>
           <th className="px-4 py-3 font-medium">Started date</th>
-          <th className="px-4 py-3 font-medium">End date</th>
           <th className="px-4 py-3 font-medium">Time</th>
           <th className="px-4 py-3 font-medium">Payment</th>
           <th className="px-4 py-3 font-medium">Lessons</th>
@@ -46,7 +45,7 @@ const GroupsTable: FC<GroupsTableProps> = ({ groups, startIndex, onOpenGroup }) 
       <tbody className="divide-y divide-gray-100">
         {groups.length === 0 ? (
           <tr>
-            <td colSpan={10} className="px-4 py-10 text-center text-gray-400">
+            <td colSpan={9} className="px-4 py-10 text-center text-gray-400">
               Guruh topilmadi
             </td>
           </tr>
@@ -70,7 +69,6 @@ const GroupsTable: FC<GroupsTableProps> = ({ groups, startIndex, onOpenGroup }) 
                 </td>
                 <td className="px-4 py-3 text-gray-600">{group.direction}</td>
                 <td className="px-4 py-3 text-gray-600">{formatDate(group.startDate)}</td>
-                <td className="px-4 py-3 text-gray-600">{formatDate(group.endDate)}</td>
                 <td className="px-4 py-3 text-gray-600">
                   {group.time}
                   <div className="mt-0.5 text-xs text-gray-400">

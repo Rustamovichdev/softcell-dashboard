@@ -21,6 +21,8 @@ export type StudentSummary = {
   currentMonth: number;
   totalDue: number;
   totalPaid: number;
+  /** Birinchi to'lov saqlangan sana va vaqti */
+  createdAt: string;
   nextDueDate: string | null;
   endDate: string;
   status: PaymentStatus;
@@ -39,6 +41,18 @@ const formatDate = (dateStr: string) => {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+  });
+};
+
+/** Sana + soat + daqiqa (qachon saqlangan) */
+const formatDateTime = (dateStr: string) => {
+  if (!dateStr) return "-";
+  return new Date(dateStr).toLocaleString("uz-UZ", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -81,12 +95,13 @@ export const groupByStudent = (payments: Payment[]): StudentSummary[] => {
       lessonName: first.lessonName,
       groupName: first.groupName,
       currency: first.currency,
-      monthlyAmount: first.amount,
+      monthlyAmount: first.dueAmount,
       totalMonths: months.length,
       paidCount: paid.length,
       currentMonth: Math.min(months.length, (nextPending?.month ?? months.length + 1) - 1 || 1),
       totalDue: months.reduce((sum, m) => sum + m.dueAmount, 0),
       totalPaid: months.reduce((sum, m) => sum + m.paidAmount, 0),
+      createdAt: months[0].createdAt,
       nextDueDate: nextPending?.dueDate ?? null,
       endDate: months[months.length - 1].dueDate,
       status: hasFailed ? "failed" : nextPending ? "pending" : "completed",
@@ -108,7 +123,7 @@ const PaymentsTable: FC<PaymentsTableProps> = ({ students, startIndex, onViewSch
             <th className="px-4 py-3 font-medium">Jami to'lov</th>
             <th className="px-4 py-3 font-medium">To'langan</th>
             <th className="px-4 py-3 font-medium">Qoldiq</th>
-            <th className="px-4 py-3 font-medium">Keyingi to'lov</th>
+            <th className="px-4 py-3 font-medium">Saqlangan</th>
             <th className="px-4 py-3 font-medium">Kurs tugaydi</th>
             <th className="px-4 py-3 font-medium">Holat</th>
           </tr>
@@ -158,7 +173,7 @@ const PaymentsTable: FC<PaymentsTableProps> = ({ students, startIndex, onViewSch
                   )}
                 </td>
                 <td className="px-4 py-3 text-gray-600">
-                  {student.nextDueDate ? formatDate(student.nextDueDate) : "To'liq to'langan"}
+                  {formatDateTime(student.createdAt)}
                 </td>
                 <td className="px-4 py-3 text-gray-600">{formatDate(student.endDate)}</td>
                 <td className="px-4 py-3">

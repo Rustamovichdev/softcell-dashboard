@@ -85,7 +85,6 @@ const buildMonthlyPayments = (enrollment: StudentEnrollment, today: Date): Payme
       lessonName: enrollment.lessonName,
       groupId: enrollment.groupId,
       groupName: enrollment.groupName,
-      amount: enrollment.monthlyAmount,
       currency: enrollment.currency,
       status,
       method: isPaid ? "click" : "cash",

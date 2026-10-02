@@ -17,7 +17,6 @@ const groupSchema = z.object({
   scheduleType: z.enum(["even", "odd", "daily"]),
   time: z.string().min(4, "Dars vaqtini kiriting"),
   startDate: z.string().min(1, "Boshlanish sanasini kiriting"),
-  endDate: z.string().min(1, "Tugash sanasini kiriting"),
   payment: z.coerce.number().min(0, "To'lov 0 dan kam bo'lmasligi kerak"),
   lessonCount: z.coerce.number().min(1, "Darslar soni 1 dan kam bo'lmasligi kerak").max(200),
   link: z.string(),
@@ -32,6 +31,9 @@ type GroupFormFields = Omit<GroupFormValues, "students">;
 
 /** Autocomplete ro'yxati id'si */
 const STUDENT_SUGGESTIONS_ID = "groups-student-suggestions";
+
+/** Forma id'si — yuqoridagi "Saqlash" tugmasi shu formani yuboradi */
+const FORM_ID = "groups-form";
 
 const GroupFormPage: FC = () => {
   const navigate = useNavigate();
@@ -60,7 +62,6 @@ const GroupFormPage: FC = () => {
       scheduleType: "even",
       time: "18:00",
       startDate: "",
-      endDate: "",
       payment: 0,
       lessonCount: 24,
       link: "",
@@ -99,7 +100,6 @@ const GroupFormPage: FC = () => {
     setValue("scheduleType", editingGroup.scheduleType);
     setValue("time", editingGroup.time);
     setValue("startDate", editingGroup.startDate);
-    setValue("endDate", editingGroup.endDate);
     setValue("payment", editingGroup.payment);
     setValue("lessonCount", editingGroup.lessonCount);
     setValue("link", editingGroup.link);
@@ -130,16 +130,21 @@ const GroupFormPage: FC = () => {
 
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-lg font-semibold sm:text-xl">
           {editingGroup ? "Guruhni tahrirlash" : "Yangi guruh qo'shish"}
         </h1>
-        <Button type="button" variant="outline" onClick={onCancel} className="h-11">
-          Bekor qilish
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button type="button" variant="outline" onClick={onCancel} className="h-11">
+            Bekor qilish
+          </Button>
+          <Button type="submit" form={FORM_ID} className="h-11">
+            Saqlash
+          </Button>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-5">
+      <form id={FORM_ID} onSubmit={handleSubmit(onSubmit)} className="max-w-3xl space-y-5">
         <label className="flex flex-col gap-1.5">
           <span className={labelClassName}>Group Name</span>
           <input
@@ -314,21 +319,13 @@ const GroupFormPage: FC = () => {
           {errors.link && <span className="text-xs text-red-500">{errors.link.message}</span>}
         </label>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          <label className="flex flex-col gap-1.5">
-            <span className={labelClassName}>Start Date</span>
-            <input {...register("startDate")} type="date" className={fieldClassName} />
-            {errors.startDate && (
-              <span className="text-xs text-red-500">{errors.startDate.message}</span>
-            )}
-          </label>
-
-          <label className="flex flex-col gap-1.5">
-            <span className={labelClassName}>End Date</span>
-            <input {...register("endDate")} type="date" className={fieldClassName} />
-            {errors.endDate && <span className="text-xs text-red-500">{errors.endDate.message}</span>}
-          </label>
-        </div>
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClassName}>Start Date</span>
+          <input {...register("startDate")} type="date" className={fieldClassName} />
+          {errors.startDate && (
+            <span className="text-xs text-red-500">{errors.startDate.message}</span>
+          )}
+        </label>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
@@ -356,15 +353,6 @@ const GroupFormPage: FC = () => {
               <span className="text-xs text-red-500">{errors.lessonCount.message}</span>
             )}
           </label>
-        </div>
-
-        <div className="mt-6 flex justify-end gap-3">
-          <Button type="button" variant="outline" onClick={onCancel} className="h-11">
-            Bekor qilish
-          </Button>
-          <Button type="submit" className="h-11">
-            Saqlash
-          </Button>
         </div>
       </form>
     </section>

@@ -1,4 +1,4 @@
-import type { Group, GroupLesson, GroupStatus } from "./types";
+import type { Group, GroupLesson, GroupScheduleType, GroupStatus } from "./types";
 
 /** Bir sahifada nechta guruh ko'rinadi */
 export const PAGE_SIZE = 10;
@@ -46,24 +46,52 @@ export const getGroupTeacherName = (group: Group) => {
   return GROUP_TEACHERS.find((t) => t.id === group.teacherId)?.name ?? "";
 };
 
+/** Haftada necha dars o'tkaziladi */
+const getLessonsPerWeek = (scheduleType: GroupScheduleType) =>
+  scheduleType === "daily" ? 7 : 2;
+
+/**
+ * Guruh tugash sanasi: startDate + darslar soni va chastotasidan hisoblanadi.
+ * (End Date alohida kiritilmaydi — foydalanuvchi shuni olib tashladi)
+ */
+export const getGroupEndDate = (
+  group: Pick<Group, "startDate" | "lessonCount" | "scheduleType">,
+) => {
+  const start = new Date(group.startDate);
+  if (Number.isNaN(start.getTime()) || group.lessonCount < 1) return null;
+
+  const weeks = Math.max(1, Math.ceil(group.lessonCount / getLessonsPerWeek(group.scheduleType)));
+  const end = new Date(start);
+  end.setDate(end.getDate() + weeks * 7 - 1);
+  return end;
+};
+
 /** Sanalarga qarab guruh holati avtomatik aniqlanadi */
-export const getGroupStatus = (group: Pick<Group, "startDate" | "endDate">): GroupStatus => {
+export const getGroupStatus = (
+  group: Pick<Group, "startDate" | "lessonCount" | "scheduleType">,
+): GroupStatus => {
   const now = new Date();
   const start = new Date(group.startDate);
-  const end = new Date(group.endDate);
+  const end = getGroupEndDate(group);
 
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return "upcoming";
+  if (Number.isNaN(start.getTime()) || !end) return "upcoming";
   if (now < start) return "upcoming";
   if (now > end) return "completed";
   return "active";
 };
 
-/** Guruh darslarini sana bo'yicha teng taqsimlab yaratadi */
-const buildLessons = (groupId: number, count: number, startDate: string, endDate: string): GroupLesson[] => {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+/** Guruh darslarini boshlanish sanasidan teng taqsimlab yaratadi */
+export const buildGroupLessons = (
+  groupId: number,
+  group: Pick<Group, "startDate" | "lessonCount" | "scheduleType">,
+): GroupLesson[] => {
+  const start = new Date(group.startDate);
+  const end = getGroupEndDate(group);
+  const count = group.lessonCount;
+  if (Number.isNaN(start.getTime()) || !end || count < 1) return [];
+
   const totalDays = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000));
-  const step = Math.max(1, Math.floor(totalDays / Math.max(1, count)));
+  const step = Math.max(1, Math.floor(totalDays / count));
   const now = new Date();
 
   return Array.from({ length: count }, (_, index) => {
@@ -94,7 +122,6 @@ export const MOCK_GROUPS: Group[] = (
       scheduleType: "even",
       time: "18:00",
       startDate: "2026-10-01",
-      endDate: "2026-12-30",
       payment: 900000,
       lessonCount: 24,
       link: "https://t.me/english_a1",
@@ -109,7 +136,6 @@ export const MOCK_GROUPS: Group[] = (
       scheduleType: "odd",
       time: "16:00",
       startDate: "2026-08-03",
-      endDate: "2026-12-28",
       payment: 1500000,
       lessonCount: 36,
       link: "https://t.me/ielts_70",
@@ -124,7 +150,6 @@ export const MOCK_GROUPS: Group[] = (
       scheduleType: "daily",
       time: "19:30",
       startDate: "2026-06-01",
-      endDate: "2026-07-30",
       payment: 750000,
       lessonCount: 20,
       link: "",
@@ -139,7 +164,6 @@ export const MOCK_GROUPS: Group[] = (
       scheduleType: "even",
       time: "14:00",
       startDate: "2026-11-02",
-      endDate: "2027-02-26",
       payment: 1100000,
       lessonCount: 30,
       link: "https://jira.softcell.uz/browse/GRAM-1",
@@ -154,7 +178,6 @@ export const MOCK_GROUPS: Group[] = (
       scheduleType: "daily",
       time: "12:00",
       startDate: "2026-09-01",
-      endDate: "2026-10-30",
       payment: 600000,
       lessonCount: 18,
       link: "",
@@ -162,5 +185,5 @@ export const MOCK_GROUPS: Group[] = (
   ] satisfies MockGroupInput[]
 ).map((group) => ({
   ...group,
-  lessons: buildLessons(group.id, group.lessonCount, group.startDate, group.endDate),
+  lessons: buildGroupLessons(group.id, group),
 }));

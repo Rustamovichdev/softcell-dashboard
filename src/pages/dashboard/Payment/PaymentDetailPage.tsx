@@ -35,9 +35,10 @@ const formatCurrency = (amount: number, currency: "UZS" | "USD") => {
   }).format(amount);
 };
 
-const formatDate = (dateStr: string) => {
+/** Sana + soat + daqiqa */
+const formatDateTime = (dateStr: string) => {
   if (!dateStr) return "-";
-  return new Date(dateStr).toLocaleDateString("uz-UZ", {
+  return new Date(dateStr).toLocaleString("uz-UZ", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -147,16 +148,12 @@ const PaymentDetailPage: FC = () => {
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <p className="text-xs text-gray-500">Yaratilgan sana</p>
-          <p className="mt-1 text-sm text-gray-900">{formatDate(payment.createdAt)}</p>
+          <p className="text-xs text-gray-500">Saqlangan sana va vaqti</p>
+          <p className="mt-1 text-sm text-gray-900">{formatDateTime(payment.createdAt)}</p>
         </div>
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <p className="text-xs text-gray-500">To'langan sana</p>
-          <p className="mt-1 text-sm text-gray-900">{formatDate(payment.paidAt)}</p>
-        </div>
-        <div className="rounded-lg border border-gray-200 bg-blue-50 p-4">
-          <p className="text-xs text-blue-700">To'lov muddati</p>
-          <p className="mt-1 text-sm text-blue-900">{formatDate(payment.dueDate)}</p>
+          <p className="text-xs text-gray-500">To&apos;langan sana va vaqti</p>
+          <p className="mt-1 text-sm text-gray-900">{formatDateTime(payment.paidAt)}</p>
         </div>
       </div>
     </section>
