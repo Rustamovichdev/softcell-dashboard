@@ -17,7 +17,7 @@ const INITIAL_LEADS: Lead[] = [
     id: 1,
     fullName: "Abdulaziz Karimov",
     age: "16 yosh",
-    direction: "Frontend",
+    direction: "Frontend (HTML, CSS, JavaScript)",
     startUp: "EduTrack",
     startUpDesc: "O'quvchilar davomatini kuzatish ilovasi",
     phone: "+998 91 100 10 20",
@@ -73,6 +73,10 @@ const COURSES = [
   "Boshqa",
 ];
  
+// Yozilgan matn kurs nomiga to'liq mos kelsa, kursning aniq nomini qaytaradi
+const findCourse = (value: string) =>
+  COURSES.find((c) => c.toLowerCase() === value.trim().toLowerCase());
+ 
 const Leads = () => {
   const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
   const [open, setOpen] = useState(false);
@@ -86,6 +90,18 @@ const Leads = () => {
   const [startUpDesc, setStartUpDesc] = useState("");
   const [phone, setPhone] = useState("");
   const [telegram, setTelegram] = useState("");
+ 
+  // Yo'nalish (combobox) holati
+  const [dirOpen, setDirOpen] = useState(false);
+  const [dirError, setDirError] = useState("");
+  const [dirPos, setDirPos] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+    maxHeight: 220,
+  });
+  const dirRef = useRef<HTMLDivElement>(null);
+  const dirFieldRef = useRef<HTMLDivElement>(null);
  
   // Bir marta yuborishni ta'minlaydi (ikki marta bosishdan himoya)
   const submittedRef = useRef(false);
@@ -113,6 +129,32 @@ const Leads = () => {
     currentPage * PAGE_SIZE
   );
  
+  // Yozilgan matn bo'yicha kurslarni filtrlaydi
+  const filteredCourses = COURSES.filter((c) =>
+    c.toLowerCase().includes(direction.trim().toLowerCase())
+  );
+ 
+  // Ro'yxatni inputning aynan ostida ochadi (forma ichida qirqilib qolmasligi uchun fixed)
+  const openDirList = () => {
+    const el = dirFieldRef.current;
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      setDirPos({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        maxHeight: Math.max(120, Math.min(220, window.innerHeight - rect.bottom - 16)),
+      });
+    }
+    setDirOpen(true);
+  };
+ 
+  const pickCourse = (course: string) => {
+    setDirection(course);
+    setDirError("");
+    setDirOpen(false);
+  };
+ 
   const openForm = () => {
     setFullName("");
     setAge("");
@@ -121,6 +163,8 @@ const Leads = () => {
     setStartUpDesc("");
     setPhone("");
     setTelegram("");
+    setDirOpen(false);
+    setDirError("");
     submittedRef.current = false;
     setSubmitted(false);
     setOpen(true);
@@ -131,6 +175,14 @@ const Leads = () => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (submittedRef.current) return;
+ 
+    // Yo'nalish kurs nomlaridan biriga mos kelishi shart
+    const matched = findCourse(direction);
+    if (!matched) {
+      setDirError("Bunday kurs yo'q. Iltimos, ro'yxatdagi kurslardan birini tanlang");
+      return;
+    }
+ 
     submittedRef.current = true;
     setSubmitted(true);
  
@@ -140,7 +192,7 @@ const Leads = () => {
         id: Date.now(),
         fullName,
         age,
-        direction,
+        direction: matched, // to'g'ri yozilgan kurs nomi saqlanadi
         startUp,
         startUpDesc,
         phone,
@@ -453,36 +505,85 @@ const Leads = () => {
           resize: vertical;
         }
  
-        .leads__form select {
-          border: 1px solid #d1d5db;
+        /* Yo'nalish: input + ochiladigan kurslar ro'yxati */
+        .leads__combo {
+          display: flex;
+          flex-direction: column;
+        }
+ 
+        .leads__combo-field {
+          position: relative;
+          display: flex;
+        }
+ 
+        .leads__form .leads__combo-field input {
+          width: 100%;
+          box-sizing: border-box;
+          padding-right: 36px;
+          cursor: pointer;
+        }
+ 
+        .leads__form .leads__input--error,
+        .leads__form .leads__input--error:focus {
+          border-color: #dc2626;
+          box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+ 
+        .leads__combo-arrow {
+          position: absolute;
+          right: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #9ca3af;
+          pointer-events: none;
+        }
+ 
+        .leads__combo-list {
+          position: fixed;
+          z-index: 10000;
+          margin: 0;
+          padding: 4px;
+          list-style: none;
+          overflow-y: auto;
+          box-sizing: border-box;
+          background: #fff;
+          border: 1px solid #e5e7eb;
           border-radius: 8px;
-          padding: 10px 36px 10px 12px;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+ 
+        .leads__combo-item {
+          width: 100%;
+          text-align: left;
+          border: none;
+          background: transparent;
+          padding: 9px 10px;
           font-size: 14px;
           font-family: inherit;
           color: #111827;
-          background-color: #fff;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 12px center;
-          appearance: none;
-          -webkit-appearance: none;
-          outline: none;
+          border-radius: 6px;
           cursor: pointer;
-          transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
  
-        .leads__form select:focus {
-          border-color: #111827;
-          box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+        .leads__combo-item:hover {
+          background: #f3f4f6;
         }
  
-        /* Hali tanlanmagan holatda placeholder rangi */
-        .leads__form select:invalid {
+        .leads__combo-item--active {
+          font-weight: 600;
+          background: #f9fafb;
+        }
+ 
+        .leads__combo-empty {
+          padding: 9px 10px;
+          font-size: 14px;
           color: #9ca3af;
         }
  
-        .leads__form select option {
-          color: #111827;
+        .leads__error {
+          margin-top: 6px;
+          font-size: 12px;
+          color: #dc2626;
         }
  
         .leads__submit {
@@ -660,116 +761,195 @@ const Leads = () => {
  
       {open &&
         createPortal(
-        // Kulrang joyga bosganda yopilmaydi, faqat X tugmasi orqali yopiladi
-        <div
-          className="leads__overlay"
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          <form className="leads__form" onSubmit={handleSubmit}>
-            <button
-              type="button"
-              className="leads__close"
-              onClick={closeForm}
-              aria-label="Yopish"
-            />
- 
-            <div className="modal-content">
-              <h2 className="form-title">Ma'lumotlarni kiriting</h2>
-            </div>
- 
-            <div className="leads__left">
-              <input
-                type="text"
-                placeholder="Ism familya"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Yosh (yoki maktabda nechanchi sinf)"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                required
-              />
-              <select
-                value={direction}
-                onChange={(e) => setDirection(e.target.value)}
-                required
-              >
-                <option value="" disabled>
-                  Yo'nalish (qaysi kursga qiziqyapti)
-                </option>
-                {COURSES.map((course) => (
-                  <option key={course} value={course}>
-                    {course}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="tel"
-                placeholder="+998 ** *** ** **"
-                value={phone}
-                maxLength={17}
-                onChange={(e) => {
-                  const digits = e.target.value
-                    .replace(/^\+998/, "")
-                    .replace(/[^0-9]/g, "")
-                    .slice(0, 9);
- 
-                  if (digits.length === 0) {
-                    setPhone("");
-                    return;
-                  }
- 
-                  const parts = [
-                    digits.slice(0, 2),
-                    digits.slice(2, 5),
-                    digits.slice(5, 7),
-                    digits.slice(7, 9),
-                  ].filter(Boolean);
- 
-                  setPhone(`+998 ${parts.join(" ")}`.trimEnd());
-                }}
-                required
-              />
-            </div>
- 
-            <div className="leads__right">
-              <input
-                type="text"
-                placeholder="StartUp nomi"
-                value={startUp}
-                onChange={(e) => setStartUp(e.target.value)}
-                required
-              />
-              <textarea
-                placeholder="StartUp haqida qisqacha yozing"
-                value={startUpDesc}
-                onChange={(e) => setStartUpDesc(e.target.value)}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Telegram (@username yoki link)"
-                value={telegram}
-                onChange={(e) => setTelegram(e.target.value)}
-                required
-              />
- 
+          // Kulrang joyga bosganda yopilmaydi, faqat X tugmasi orqali yopiladi
+          <div
+            className="leads__overlay"
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <form
+              className="leads__form"
+              onSubmit={handleSubmit}
+              onScroll={() => setDirOpen(false)}
+            >
               <button
-                type="submit"
-                className="leads__submit"
-                disabled={submitted}
-              >
-                Kiritish
-              </button>
-            </div>
-          </form>
-        </div>,
-        document.body
-      )}
+                type="button"
+                className="leads__close"
+                onClick={closeForm}
+                aria-label="Yopish"
+              />
+ 
+              <div className="modal-content">
+                <h2 className="form-title">Ma'lumotlarni kiriting</h2>
+              </div>
+ 
+              <div className="leads__left">
+                <input
+                  type="text"
+                  placeholder="Ism familya"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Yosh (yoki maktabda nechanchi sinf)"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  required
+                />
+ 
+                {/* Yo'nalish: bosganda kurslar ro'yxati ochiladi, yozganda filtrlanadi */}
+                <div
+                  className="leads__combo"
+                  ref={dirRef}
+                  onBlur={(e) => {
+                    // Fokus combobox'dan tashqariga chiqsa: ro'yxatni yopamiz va tekshiramiz
+                    if (!dirRef.current?.contains(e.relatedTarget as Node)) {
+                      setDirOpen(false);
+                      if (direction.trim() && !findCourse(direction)) {
+                        setDirError("Bunday kurs yo'q. Iltimos, ro'yxatdagi kurslardan birini tanlang");
+                      }
+                    }
+                  }}
+                >
+                  <div className="leads__combo-field" ref={dirFieldRef}>
+                    <input
+                      type="text"
+                      className={dirError ? "leads__input--error" : ""}
+                      placeholder="Yo'nalish (qaysi kursga qiziqyapti)"
+                      value={direction}
+                      autoComplete="off"
+                      onClick={openDirList}
+                      onFocus={openDirList}
+                      onChange={(e) => {
+                        setDirection(e.target.value);
+                        setDirError("");
+                        openDirList();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Escape") setDirOpen(false);
+                        if (e.key === "Enter" && dirOpen && filteredCourses.length > 0) {
+                          // Enter bosilganda formani yubormasdan, birinchi mos kursni tanlaydi
+                          e.preventDefault();
+                          pickCourse(filteredCourses[0]);
+                        }
+                      }}
+                      required
+                    />
+                    <svg
+                      className="leads__combo-arrow"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </div>
+ 
+                  {dirOpen && (
+                    <ul
+                      className="leads__combo-list"
+                      style={{
+                        top: dirPos.top,
+                        left: dirPos.left,
+                        width: dirPos.width,
+                        maxHeight: dirPos.maxHeight,
+                      }}
+                    >
+                      {filteredCourses.length === 0 ? (
+                        <li className="leads__combo-empty">Kurs topilmadi</li>
+                      ) : (
+                        filteredCourses.map((course) => (
+                          <li key={course}>
+                            <button
+                              type="button"
+                              className={
+                                "leads__combo-item" +
+                                (course === direction ? " leads__combo-item--active" : "")
+                              }
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => pickCourse(course)}
+                            >
+                              {course}
+                            </button>
+                          </li>
+                        ))
+                      )}
+                    </ul>
+                  )}
+ 
+                  {dirError && <span className="leads__error">{dirError}</span>}
+                </div>
+ 
+                <input
+                  type="tel"
+                  placeholder="+998 ** *** ** **"
+                  value={phone}
+                  maxLength={17}
+                  onChange={(e) => {
+                    const digits = e.target.value
+                      .replace(/^\+998/, "")
+                      .replace(/[^0-9]/g, "")
+                      .slice(0, 9);
+ 
+                    if (digits.length === 0) {
+                      setPhone("");
+                      return;
+                    }
+ 
+                    const parts = [
+                      digits.slice(0, 2),
+                      digits.slice(2, 5),
+                      digits.slice(5, 7),
+                      digits.slice(7, 9),
+                    ].filter(Boolean);
+ 
+                    setPhone(`+998 ${parts.join(" ")}`.trimEnd());
+                  }}
+                  required
+                />
+              </div>
+ 
+              <div className="leads__right">
+                <input
+                  type="text"
+                  placeholder="StartUp nomi"
+                  value={startUp}
+                  onChange={(e) => setStartUp(e.target.value)}
+                  required
+                />
+                <textarea
+                  placeholder="StartUp haqida qisqacha yozing"
+                  value={startUpDesc}
+                  onChange={(e) => setStartUpDesc(e.target.value)}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Telegram (@username yoki link)"
+                  value={telegram}
+                  onChange={(e) => setTelegram(e.target.value)}
+                  required
+                />
+ 
+                <button
+                  type="submit"
+                  className="leads__submit"
+                  disabled={submitted}
+                >
+                  Kiritish
+                </button>
+              </div>
+            </form>
+          </div>,
+          document.body
+        )}
     </div>
   );
 };
