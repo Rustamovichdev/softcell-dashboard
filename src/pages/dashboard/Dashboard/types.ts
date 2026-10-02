@@ -13,13 +13,13 @@ export interface ChartPoint {
   value: number;
 }
 
-export type LeadStatus = "yangi" | "aloqada" | "qabul_qilindi" | "bekor_qilindi";
-
-export interface RecentLead {
+// Marketing xarajatlari turi
+export interface MarketingExpense {
   id: string;
-  name: string;
-  phone: string;
-  direction: string;
-  createdAt: string;
-  status: LeadStatus;
+  channel: string;       // Masalan: "Instagram Target", "Telegram Ads"
+  spent: number;         // Sarflangan pul (so'mda)
+  budget: number;        // Ajratilgan budjet
+  leadsCount: number;    // Shu kanaldan kelgan lidlar soni
+  costPerLead: number;   // Bitta lid narxi (CPL)
+  color: string;         // Chiziq rangi
 }
