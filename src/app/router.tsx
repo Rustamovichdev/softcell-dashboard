@@ -65,22 +65,22 @@ export const appRoutes: AppRoute[] = [
     component: lazy(() => import("../pages/dashboard/Students")),
   },
   {
-    path: "/lessons",
-    label: "Lessons",
-    icon: "lessons",
-    component: lazy(() => import("../pages/dashboard/Lessons")),
+    path: "/groups",
+    label: "Groups",
+    icon: "groups",
+    component: lazy(() => import("../pages/dashboard/Groups")),
   },
   {
-    path: "/lessons/new",
-    component: lazy(() => import("../pages/dashboard/Lessons/LessonFormPage")),
+    path: "/groups/new",
+    component: lazy(() => import("../pages/dashboard/Groups/GroupFormPage")),
   },
   {
-    path: "/lessons/:lessonId",
-    component: lazy(() => import("../pages/dashboard/Lessons/LessonDetailPage")),
+    path: "/groups/:groupId",
+    component: lazy(() => import("../pages/dashboard/Groups/GroupDetailPage")),
   },
   {
-    path: "/lessons/:lessonId/add-group",
-    component: lazy(() => import("../pages/dashboard/Lessons/AddGroupPage")),
+    path: "/groups/:groupId/edit",
+    component: lazy(() => import("../pages/dashboard/Groups/GroupFormPage")),
   },
   {
     path: "/meets",
