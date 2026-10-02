@@ -16,7 +16,6 @@ const paymentSchema = z.object({
   lessonName: z.string().min(2, "Kurs nomi kerak"),
   groupId: z.coerce.number().min(1, "Guruh tanlanishi kerak"),
   groupName: z.string().min(2, "Guruh nomi kerak"),
-  amount: z.coerce.number().min(1, "Summa 0 dan katta bo'lishi kerak"),
   currency: z.enum(["UZS", "USD"]),
   status: z.enum(["pending", "completed", "failed", "refunded"]),
   method: z.enum(["cash", "card", "transfer", "click", "payme"]),
@@ -29,6 +28,9 @@ const paymentSchema = z.object({
 
 const fieldClassName = "h-11 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-400 focus:bg-white";
 const labelClassName = "text-xs font-medium text-gray-600 sm:text-sm";
+
+/** Forma id'si — yuqoridagi "Saqlash" tugmasi shu formani yuboradi */
+const FORM_ID = "payment-edit-form";
 
 const lessons = [
   { id: 1, name: "Frontend Development" },
@@ -80,7 +82,6 @@ const PaymentEditPage: FC = () => {
       lessonName: "Frontend Development",
       groupId: 101,
       groupName: "Alpha",
-      amount: 0,
       currency: "UZS",
       status: "pending",
       method: "cash",
@@ -101,14 +102,12 @@ const PaymentEditPage: FC = () => {
       setValue("lessonName", payment.lessonName);
       setValue("groupId", payment.groupId);
       setValue("groupName", payment.groupName);
-      setValue("amount", payment.amount);
       setValue("currency", payment.currency);
       setValue("status", payment.status);
       setValue("method", payment.method);
       setValue("description", payment.description);
       setValue("dueAmount", payment.dueAmount);
       setValue("paidAmount", payment.paidAmount);
-      setValue("dueDate", payment.dueDate ? payment.dueDate.slice(0, 10) : "");
       setValue("month", payment.month);
       setValue("totalMonths", payment.totalMonths);
     }
@@ -159,7 +158,7 @@ const PaymentEditPage: FC = () => {
 
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
-      <div className="flex items-center justify-between gap-4 mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-4">
           <Button type="button" variant="outline" onClick={onCancel} className="h-11">
             <Icon name="chevron-down" className="h-4 w-4 mr-2" />
@@ -170,9 +169,12 @@ const PaymentEditPage: FC = () => {
             <p className="mt-1 text-xs text-gray-500 sm:text-sm">ID: {payment.id}</p>
           </div>
         </div>
+        <Button type="submit" form={FORM_ID} className="h-11">
+          Saqlash
+        </Button>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-5">
+      <form id={FORM_ID} onSubmit={handleSubmit(onSubmit)} className="max-w-2xl space-y-5">
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className={labelClassName}>Talaba</span>
@@ -296,12 +298,6 @@ const PaymentEditPage: FC = () => {
             />
             {errors.totalMonths && <span className="text-xs text-red-500">{errors.totalMonths.message}</span>}
           </label>
-
-          <label className="flex flex-col gap-1.5">
-            <span className={labelClassName}>To'lov muddati (sana)</span>
-            <input {...register("dueDate")} type="date" className={fieldClassName} />
-            {errors.dueDate && <span className="text-xs text-red-500">{errors.dueDate.message}</span>}
-          </label>
         </div>
 
         <label className="flex flex-col gap-1.5">
@@ -314,15 +310,6 @@ const PaymentEditPage: FC = () => {
           />
           {errors.description && <span className="text-xs text-red-500">{errors.description.message}</span>}
         </label>
-
-        <div className="mt-6 flex gap-3 justify-end">
-          <Button type="button" variant="outline" onClick={onCancel} className="h-11">
-            Bekor qilish
-          </Button>
-          <Button type="submit" className="h-11">
-            Saqlash
-          </Button>
-        </div>
       </form>
     </section>
   );

@@ -40,7 +40,7 @@ const Payment: FC = () => {
   const visibleStudents = students.slice(startIndex, startIndex + PAGE_SIZE);
 
   const totalAmount = useMemo(
-    () => payments.reduce((sum, p) => sum + (p.amount ?? 0), 0),
+    () => payments.reduce((sum, p) => sum + (p.dueAmount ?? 0), 0),
     [payments],
   );
   const totalPaid = useMemo(

@@ -56,7 +56,6 @@ const GroupDetailPage: FC = () => {
     { label: "Teacher", value: teacherName || "Biriktirilmagan" },
     { label: "Students", value: `${group.students.length} ta student` },
     { label: "Start date", value: formatDate(group.startDate) },
-    { label: "End date", value: formatDate(group.endDate) },
     { label: "Payment", value: formatMoney(group.payment) },
     { label: "Status", value: statusLabels[status] },
     { label: "Time", value: `${group.time} (${scheduleTypeLabels[group.scheduleType]})` },

@@ -12,7 +12,6 @@ export type Payment = {
   lessonName: string;
   groupId: number;
   groupName: string;
-  amount: number;
   currency: PaymentCurrency;
   status: PaymentStatus;
   method: PaymentMethod;
