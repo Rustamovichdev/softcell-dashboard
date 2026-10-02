@@ -1,342 +1,314 @@
 
-import { useState, useEffect } from "react";
-import type { FC, FormEvent } from "react";
+import { useState, useMemo, type FC } from "react";
 
-export type DirectionStatus = "active" | "inactive";
-export type CourseLevel = "Boshlang'ich" | "O'rta" | "Murakkab" | "Barchaga";
-export type CourseFormat = "Oflayn" | "Onlayn" | "Gibrid";
-
-export interface Direction {
+interface Direction {
   id: string;
-  name: string;
-  category: string; // Kategoriya: Dasturlash, Dizayn, va h.k.
+  title: string;
+  category: "Dasturlash" | "Dizayn" | "Mobil" | "Boshlang'ich" | "Aniq fanlar";
   description: string;
-  durationMonths: number;
-  lessonHoursPerWeek: number; // Haftalik dars soati
-  format: CourseFormat;
-  level: CourseLevel;
+  technologies: string[];
   monthlyPrice: number;
-  fullPriceDiscount?: number; // Bir yo'la to'lasa chegirma (%)
-  technologies: string[]; // Masalan: ["React", "TypeScript", "Next.js"]
+  durationMonths: number;
+  weeklyHours: number;
   groupsCount: number;
   studentsCount: number;
-  mentorsCount: number;
-  status: DirectionStatus;
-  createdAt: string;
+  format: "Gibrid" | "Oflayn" | "Onlayn";
+  status: "Faol" | "Yopiq";
 }
 
-const INITIAL_DIRECTIONS: Direction[] = [
+const AVAILABLE_TECH_SUGGESTIONS = [
+  "React",
+  "React Native",
+  "Redux Toolkit",
+  "TypeScript",
+  "JavaScript",
+  "HTML5",
+  "CSS3",
+  "Tailwind CSS",
+  "Node.js",
+  "NestJS",
+  "Express.js",
+  "Python",
+  "Django",
+  "PostgreSQL",
+  "MongoDB",
+  "Docker",
+  "Kubernetes",
+  "Go (Golang)",
+  "Figma",
+  "Photoshop",
+  "Illustrator",
+  "UI/UX Prototyping",
+  "SAT Math",
+  "Algebra",
+  "Geometry",
+  "Calculus",
+  "Data Analysis",
+  "Machine Learning",
+  "Network Security",
+  "Linux Admin",
+];
+
+const initialDirections: Direction[] = [
   {
     id: "1",
-    name: "Frontend Dasturlash",
+    title: "Frontend Pro (Intensiv)",
     category: "Dasturlash",
-    description: "Veb-saytlar va murakkab veb-ilovalarning foydalanuvchi interfeysini noldan professional darajagacha yaratish.",
-    durationMonths: 8,
-    lessonHoursPerWeek: 6,
+    description: "Zamonaviy veb-ilovalarni noldan professional darajada arxitektura qilish va optimallashtirish.",
+    technologies: ["React", "TypeScript", "Next.js", "Tailwind CSS", "Redux Toolkit"],
+    monthlyPrice: 1500000,
+    durationMonths: 7,
+    weeklyHours: 16,
+    groupsCount: 5,
+    studentsCount: 65,
     format: "Gibrid",
-    level: "Boshlang'ich",
-    monthlyPrice: 1200000,
-    fullPriceDiscount: 10,
-    technologies: ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js", "Tailwind CSS"],
-    groupsCount: 6,
-    studentsCount: 78,
-    mentorsCount: 3,
-    status: "active",
-    createdAt: "2025-09-01",
+    status: "Faol",
   },
   {
     id: "2",
-    name: "Backend Dasturlash (Node.js & Python)",
+    title: "Backend Pro (Node.js & Go)",
     category: "Dasturlash",
-    description: "Serverlar, API arxitekturasi, ma'lumotlar bazalari va xavfsiz backend tizimlarini ishlab chiqish.",
-    durationMonths: 9,
-    lessonHoursPerWeek: 6,
-    format: "Oflayn",
-    level: "O'rta",
-    monthlyPrice: 1400000,
-    fullPriceDiscount: 15,
-    technologies: ["Node.js", "NestJS", "Python", "PostgreSQL", "Redis", "Docker"],
+    description: "Yuqori yuklamali serverlar, mikroservislar va ma'lumotlar bazalari arxitekturasi.",
+    technologies: ["Node.js", "NestJS", "Go (Golang)", "PostgreSQL", "Docker"],
+    monthlyPrice: 1600000,
+    durationMonths: 8,
+    weeklyHours: 14,
     groupsCount: 4,
-    studentsCount: 52,
-    mentorsCount: 2,
-    status: "active",
-    createdAt: "2025-09-10",
+    studentsCount: 50,
+    format: "Oflayn",
+    status: "Faol",
   },
   {
     id: "3",
-    name: "Grafik Dizayn va UI/UX",
-    category: "Dizayn",
-    description: "Brending, tipografika hamda mobil va veb-interfeyslar uchun zamonaviy prototiplar chizish.",
-    durationMonths: 6,
-    lessonHoursPerWeek: 4,
-    format: "Gibrid",
-    level: "Boshlang'ich",
-    monthlyPrice: 1000000,
-    fullPriceDiscount: 5,
-    technologies: ["Figma", "Photoshop", "Illustrator", "Prototyping"],
-    groupsCount: 5,
-    studentsCount: 60,
-    mentorsCount: 2,
-    status: "active",
-    createdAt: "2025-10-05",
+    title: "SAT Matematika (Advanced)",
+    category: "Aniq fanlar",
+    description: "Xalqaro universitetlarga kirish uchun SAT Math bo'yicha 750+ ball kafolati bilan tayyorlov.",
+    technologies: ["SAT Math", "Algebra", "Geometry", "Calculus"],
+    monthlyPrice: 1200000,
+    durationMonths: 5,
+    weeklyHours: 10,
+    groupsCount: 6,
+    studentsCount: 82,
+    format: "Oflayn",
+    status: "Faol",
   },
   {
     id: "4",
-    name: "Foundation IT Savodxonlik",
-    category: "Boshlang'ich",
-    description: "Kompyuter arxitekturasi, mantiqiy fikrlash, algoritmlar va C dasturlash tili asoslari.",
-    durationMonths: 3,
-    lessonHoursPerWeek: 4,
-    format: "Oflayn",
-    level: "Boshlang'ich",
-    monthlyPrice: 800000,
-    fullPriceDiscount: 0,
-    technologies: ["C", "Algorithms", "Git", "Computer Science"],
-    groupsCount: 8,
-    studentsCount: 110,
-    mentorsCount: 4,
-    status: "active",
-    createdAt: "2025-11-12",
+    title: "Grafik Dizayn va UI/UX",
+    category: "Dizayn",
+    description: "Brending, tipografika, mobil va veb-interfeyslar uchun zamonaviy prototiplar chizish.",
+    technologies: ["Figma", "Photoshop", "Illustrator", "UI/UX Prototyping"],
+    monthlyPrice: 1000000,
+    durationMonths: 6,
+    weeklyHours: 8,
+    groupsCount: 5,
+    studentsCount: 60,
+    format: "Gibrid",
+    status: "Faol",
   },
   {
     id: "5",
-    name: "Android & iOS (Flutter)",
-    category: "Mobil",
-    description: "Flutter freymvorki yordamida ikkala platforma uchun bitta kod bazasida mobil ilovalar yaratish.",
-    durationMonths: 7,
-    lessonHoursPerWeek: 6,
-    format: "Onlayn",
-    level: "O'rta",
-    monthlyPrice: 1300000,
-    fullPriceDiscount: 10,
-    technologies: ["Dart", "Flutter", "REST API", "Bloc"],
-    groupsCount: 2,
-    studentsCount: 24,
-    mentorsCount: 1,
-    status: "inactive",
-    createdAt: "2025-12-01",
+    title: "Data Science & AI",
+    category: "Dasturlash",
+    description: "Katta ma'lumotlar tahlili, Machine Learning va sun'iy intellekt modellarini o'rgatish.",
+    technologies: ["Python", "Data Analysis", "Machine Learning", "PostgreSQL"],
+    monthlyPrice: 1800000,
+    durationMonths: 9,
+    weeklyHours: 12,
+    groupsCount: 3,
+    studentsCount: 35,
+    format: "Gibrid",
+    status: "Faol",
+  },
+  {
+    id: "6",
+    title: "IT Foundation (Boshlang'ich)",
+    category: "Boshlang'ich",
+    description: "Kompyuter savodxonligi, mantiqiy fikrlash va dasturlashga ilk mustahkam qadamlar.",
+    technologies: ["HTML5", "CSS3", "JavaScript"],
+    monthlyPrice: 700000,
+    durationMonths: 3,
+    weeklyHours: 6,
+    groupsCount: 8,
+    studentsCount: 110,
+    format: "Oflayn",
+    status: "Faol",
   },
 ];
 
-const CATEGORIES = ["Barchasi", "Dasturlash", "Dizayn", "Mobil", "Boshlang'ich"];
-
-const Directions: FC = () => {
+const DirectionsPage: FC = () => {
   const [directions, setDirections] = useState<Direction[]>(() => {
-    const saved = localStorage.getItem("softcell_directions_v2");
-    return saved ? JSON.parse(saved) : INITIAL_DIRECTIONS;
+    try {
+      const saved = localStorage.getItem("softcell_directions_list");
+      return saved ? JSON.parse(saved) : initialDirections;
+    } catch {
+      return initialDirections;
+    }
   });
 
-  useEffect(() => {
-    localStorage.setItem("softcell_directions_v2", JSON.stringify(directions));
-  }, [directions]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("Barchasi");
+  const [selectedStatus, setSelectedStatus] = useState<string>("Barcha holatlar");
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+
+  // Yangi qo'shish modal holati
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newCategory, setNewCategory] = useState<Direction["category"]>("Dasturlash");
+  const [newDescription, setNewDescription] = useState("");
+  const [newMonthlyPrice, setNewMonthlyPrice] = useState("1200000");
+  const [newDuration, setNewDuration] = useState("6");
+  const [newWeeklyHours, setNewWeeklyHours] = useState("8");
+  const [newFormat, setNewFormat] = useState<Direction["format"]>("Gibrid");
+
+  // Texnologiyalar inputi va tavsiyalar
+  const [techInput, setTechInput] = useState("");
+  const [selectedTechs, setSelectedTechs] = useState<string[]>(["React", "TypeScript"]);
+
+  const saveDirections = (updated: Direction[]) => {
+    setDirections(updated);
+    localStorage.setItem("softcell_directions_list", JSON.stringify(updated));
+  };
 
   // Filtrlar
-  const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("Barchasi");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const filteredDirections = useMemo(() => {
+    return directions.filter((item) => {
+      const query = searchQuery.toLowerCase().trim();
+      const matchesSearch =
+        !query ||
+        item.title.toLowerCase().includes(query) ||
+        item.technologies.some((t) => t.toLowerCase().includes(query));
 
-  // Modallar
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [detailItem, setDetailItem] = useState<Direction | null>(null);
-  const [editingItem, setEditingItem] = useState<Direction | null>(null);
-  const [deletingItem, setDeletingItem] = useState<Direction | null>(null);
+      const matchesCat =
+        selectedCategory === "Barchasi" || item.category === selectedCategory;
 
-  // Form maydonlari
-  const [formName, setFormName] = useState("");
-  const [formCategory, setFormCategory] = useState("Dasturlash");
-  const [formDescription, setFormDescription] = useState("");
-  const [formDuration, setFormDuration] = useState(6);
-  const [formHours, setFormHours] = useState(6);
-  const [formPrice, setFormPrice] = useState(1200000);
-  const [formDiscount, setFormDiscount] = useState(10);
-  const [formFormat, setFormFormat] = useState<CourseFormat>("Gibrid");
-  const [formLevel, setFormLevel] = useState<CourseLevel>("Boshlang'ich");
-  const [formStatus, setFormStatus] = useState<DirectionStatus>("active");
-  const [formTechs, setFormTechs] = useState("");
-  const [formError, setFormError] = useState("");
+      const matchesStat =
+        selectedStatus === "Barcha holatlar" || item.status === selectedStatus;
 
-  // Qidiruv va saralash
-  const filteredDirections = directions.filter((item) => {
-    const query = search.toLowerCase();
-    const matchesSearch =
-      item.name.toLowerCase().includes(query) ||
-      item.description.toLowerCase().includes(query) ||
-      item.technologies.some((t) => t.toLowerCase().includes(query));
+      return matchesSearch && matchesCat && matchesStat;
+    });
+  }, [directions, searchQuery, selectedCategory, selectedStatus]);
 
-    const matchesCategory =
-      categoryFilter === "Barchasi" || item.category === categoryFilter;
-    const matchesStatus =
-      statusFilter === "all" || item.status === statusFilter;
+  // Texnologiyalar avtomatik taklifi (suggestions)
+  const techSuggestions = useMemo(() => {
+    if (!techInput.trim()) return [];
+    const query = techInput.toLowerCase();
+    return AVAILABLE_TECH_SUGGESTIONS.filter(
+      (tech) =>
+        tech.toLowerCase().includes(query) && !selectedTechs.includes(tech)
+    );
+  }, [techInput, selectedTechs]);
 
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
-
-  // KPI ko'rsatkichlari
-  const totalDirections = directions.length;
-  const activeDirections = directions.filter((d) => d.status === "active").length;
-  const totalStudents = directions.reduce((a, b) => a + b.studentsCount, 0);
-  const totalGroups = directions.reduce((a, b) => a + b.groupsCount, 0);
-
-  // Modalni ochish (Yangi)
-  const handleOpenCreate = () => {
-    setEditingItem(null);
-    setFormName("");
-    setFormCategory("Dasturlash");
-    setFormDescription("");
-    setFormDuration(6);
-    setFormHours(6);
-    setFormPrice(1200000);
-    setFormDiscount(10);
-    setFormFormat("Gibrid");
-    setFormLevel("Boshlang'ich");
-    setFormStatus("active");
-    setFormTechs("React, TypeScript, CSS");
-    setFormError("");
-    setIsModalOpen(true);
+  const addTechTag = (tech: string) => {
+    if (!selectedTechs.includes(tech)) {
+      setSelectedTechs([...selectedTechs, tech]);
+    }
+    setTechInput("");
   };
 
-  // Modalni ochish (Tahrirlash)
-  const handleOpenEdit = (item: Direction) => {
-    setEditingItem(item);
-    setFormName(item.name);
-    setFormCategory(item.category);
-    setFormDescription(item.description);
-    setFormDuration(item.durationMonths);
-    setFormHours(item.lessonHoursPerWeek);
-    setFormPrice(item.monthlyPrice);
-    setFormDiscount(item.fullPriceDiscount || 0);
-    setFormFormat(item.format);
-    setFormLevel(item.level);
-    setFormStatus(item.status);
-    setFormTechs(item.technologies.join(", "));
-    setFormError("");
-    setIsModalOpen(true);
+  const removeTechTag = (techToRemove: string) => {
+    setSelectedTechs(selectedTechs.filter((t) => t !== techToRemove));
   };
 
-  // Saqlash
-  const handleSave = (e: FormEvent) => {
+  const handleCreateDirection = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName.trim()) {
-      setFormError("Yo'nalish nomini kiritish majburiy!");
-      return;
-    }
+    if (!newTitle.trim()) return;
 
-    const techArray = formTechs
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
+    const newDir: Direction = {
+      id: Date.now().toString(),
+      title: newTitle,
+      category: newCategory,
+      description: newDescription || "Kurs haqida batafsil ma'lumot kiritilmagan.",
+      technologies: selectedTechs.length ? selectedTechs : ["Boshlang'ich"],
+      monthlyPrice: Number(newMonthlyPrice) || 1000000,
+      durationMonths: Number(newDuration) || 6,
+      weeklyHours: Number(newWeeklyHours) || 8,
+      groupsCount: 1,
+      studentsCount: 15,
+      format: newFormat,
+      status: "Faol",
+    };
 
-    if (editingItem) {
-      setDirections((prev) =>
-        prev.map((item) =>
-          item.id === editingItem.id
-            ? {
-                ...item,
-                name: formName.trim(),
-                category: formCategory,
-                description: formDescription.trim(),
-                durationMonths: Number(formDuration) || 1,
-                lessonHoursPerWeek: Number(formHours) || 1,
-                monthlyPrice: Number(formPrice) || 0,
-                fullPriceDiscount: Number(formDiscount) || 0,
-                format: formFormat,
-                level: formLevel,
-                status: formStatus,
-                technologies: techArray,
-              }
-            : item
-        )
-      );
-    } else {
-      const newItem: Direction = {
-        id: String(Date.now()),
-        name: formName.trim(),
-        category: formCategory,
-        description: formDescription.trim(),
-        durationMonths: Number(formDuration) || 1,
-        lessonHoursPerWeek: Number(formHours) || 1,
-        monthlyPrice: Number(formPrice) || 0,
-        fullPriceDiscount: Number(formDiscount) || 0,
-        format: formFormat,
-        level: formLevel,
-        status: formStatus,
-        technologies: techArray,
-        groupsCount: 0,
-        studentsCount: 0,
-        mentorsCount: 1,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setDirections((prev) => [newItem, ...prev]);
-    }
-
+    saveDirections([newDir, ...directions]);
     setIsModalOpen(false);
+
+    // Formani tozalash
+    setNewTitle("");
+    setNewDescription("");
+    setSelectedTechs(["React", "TypeScript"]);
   };
 
-  // O'chirish
-  const handleDelete = () => {
-    if (!deletingItem) return;
-    setDirections((prev) => prev.filter((i) => i.id !== deletingItem.id));
-    setDeletingItem(null);
+  const handleDelete = (id: string) => {
+    if (window.confirm("Rostdan ham ushbu yo'nalishni o'chirmoqchimisiz?")) {
+      saveDirections(directions.filter((d) => d.id !== id));
+    }
   };
 
   return (
-    <div className="space-y-6 p-4 sm:p-6 bg-gray-50/40 min-h-screen">
-      {/* 1. Sarlavha va Qo'shish tugmasi */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="w-full min-h-screen bg-neutral-50/50 p-4 md:p-8">
+      {/* Yuqori qism */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 tracking-tight">
             Yo'nalishlar (Directions)
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            O'quv markazidagi mutaxassisliklar, kurs narxlari, davomiyligi va o'rgatiladigan texnologiyalar
+          <p className="mt-1 text-sm text-neutral-500">
+            O'quv markazidagi mutaxassisliklar, kurs narxlari, davomiyligi va texnologiyalar
           </p>
         </div>
+
         <button
-          onClick={handleOpenCreate}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition"
+          onClick={() => setIsModalOpen(true)}
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 hover:bg-black text-white font-medium text-sm rounded-xl transition shadow-sm hover:shadow self-start md:self-auto"
         >
-          <span className="text-lg leading-none">+</span> Yangi yo'nalish qo'shish
+          <span>+</span>
+          <span>Yangi yo'nalish qo'shish</span>
         </button>
       </div>
 
-      {/* 2. Statistika paneli (KPI) */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs">
-          <p className="text-xs font-medium text-gray-500 uppercase">Jami yo'nalishlar</p>
-          <p className="mt-2 text-2xl font-bold text-gray-900">{totalDirections} ta</p>
-          <span className="text-xs text-green-600 font-medium">Barcha sohalar</span>
+      {/* Statistika kartalari */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
+          <p className="text-xs font-semibold text-neutral-500 uppercase">Jami yo'nalishlar</p>
+          <p className="text-2xl font-bold text-neutral-900 mt-2">{directions.length} ta</p>
+          <span className="text-xs text-neutral-400 mt-1 block">Barcha sohalar</span>
         </div>
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs">
-          <p className="text-xs font-medium text-gray-500 uppercase">Faol yo'nalishlar</p>
-          <p className="mt-2 text-2xl font-bold text-green-600">{activeDirections} ta</p>
-          <span className="text-xs text-gray-500">Qabul ochiq</span>
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
+          <p className="text-xs font-semibold text-neutral-500 uppercase">Faol yo'nalishlar</p>
+          <p className="text-2xl font-bold text-emerald-600 mt-2">
+            {directions.filter((d) => d.status === "Faol").length} ta
+          </p>
+          <span className="text-xs text-emerald-600/80 mt-1 block">Qabul ochiq</span>
         </div>
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs">
-          <p className="text-xs font-medium text-gray-500 uppercase">Guruhlar soni</p>
-          <p className="mt-2 text-2xl font-bold text-indigo-600">{totalGroups} ta</p>
-          <span className="text-xs text-gray-500">Hozirda o'qiyotgan</span>
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
+          <p className="text-xs font-semibold text-neutral-500 uppercase">Guruhlar soni</p>
+          <p className="text-2xl font-bold text-neutral-900 mt-2">
+            {directions.reduce((acc, curr) => acc + curr.groupsCount, 0)} ta
+          </p>
+          <span className="text-xs text-neutral-400 mt-1 block">Hozirda o'qiyotgan</span>
         </div>
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-xs">
-          <p className="text-xs font-medium text-gray-500 uppercase">O'quvchilar soni</p>
-          <p className="mt-2 text-2xl font-bold text-purple-600">{totalStudents} nafar</p>
-          <span className="text-xs text-gray-500">Jami qamrov</span>
+        <div className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm">
+          <p className="text-xs font-semibold text-neutral-500 uppercase">O'quvchilar soni</p>
+          <p className="text-2xl font-bold text-neutral-900 mt-2">
+            {directions.reduce((acc, curr) => acc + curr.studentsCount, 0)} nafar
+          </p>
+          <span className="text-xs text-neutral-400 mt-1 block">Jami qamrov</span>
         </div>
       </div>
 
-      {/* 3. Kategoriya teglari va Qidiruv filtrlari */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-xs">
-        {/* Kategoriya tablari */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-gray-100 pb-3">
-          <span className="text-xs font-semibold text-gray-400 mr-2">Soha:</span>
-          {CATEGORIES.map((cat) => (
+      {/* Filtrlar va Qidiruv */}
+      <div className="bg-white p-4 rounded-2xl border border-neutral-200 shadow-sm mb-6 space-y-4">
+        {/* Soha bo'yicha tezkor filtrlar */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-sm">
+          <span className="text-xs font-semibold text-neutral-400 uppercase mr-1">Soha:</span>
+          {["Barchasi", "Dasturlash", "Dizayn", "Mobil", "Boshlang'ich", "Aniq fanlar"].map((cat) => (
             <button
               key={cat}
-              onClick={() => setCategoryFilter(cat)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-                categoryFilter === cat
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1.5 rounded-xl font-medium text-xs whitespace-nowrap transition ${
+                selectedCategory === cat
+                  ? "bg-neutral-900 text-white"
+                  : "bg-neutral-100 hover:bg-neutral-200 text-neutral-700"
               }`}
             >
               {cat}
@@ -344,40 +316,49 @@ const Directions: FC = () => {
           ))}
         </div>
 
-        {/* Qidiruv, Holat va Ko'rinish turi */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+        {/* Jonli qidiruv qatori */}
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="relative flex-1">
             <input
               type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Yo'nalish yoki texnologiya (masalan: React) bo'yicha qidirish..."
-              className="w-full sm:max-w-md rounded-xl border border-gray-300 px-3.5 py-2 text-sm outline-none focus:border-indigo-600"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Yo'nalish yoki texnologiya (masalan: React, SAT, Python)..."
+              className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-900"
             />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm outline-none focus:border-indigo-600"
-            >
-              <option value="all">Barcha holatlar</option>
-              <option value="active">Faqat Faol (qabul ochiq)</option>
-              <option value="inactive">Faqat Nofaol</option>
-            </select>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-600 text-sm"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
-          <div className="flex items-center gap-1 self-end sm:self-auto rounded-xl border border-gray-200 bg-gray-50 p-1">
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="px-4 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900/10"
+          >
+            <option value="Barcha holatlar">Barcha holatlar</option>
+            <option value="Faol">Faol</option>
+            <option value="Yopiq">Yopiq</option>
+          </select>
+
+          <div className="flex rounded-xl border border-neutral-200 overflow-hidden self-end md:self-auto">
             <button
-              onClick={() => setViewMode("grid")}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-                viewMode === "grid" ? "bg-white text-gray-900 shadow-xs" : "text-gray-500"
+              onClick={() => setViewMode("cards")}
+              className={`px-3 py-2 text-xs font-medium transition ${
+                viewMode === "cards" ? "bg-neutral-900 text-white" : "bg-white text-neutral-600"
               }`}
             >
               Kartalar
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-                viewMode === "table" ? "bg-white text-gray-900 shadow-xs" : "text-gray-500"
+              className={`px-3 py-2 text-xs font-medium transition ${
+                viewMode === "table" ? "bg-neutral-900 text-white" : "bg-white text-neutral-600"
               }`}
             >
               Jadval
@@ -386,102 +367,80 @@ const Directions: FC = () => {
         </div>
       </div>
 
-      {/* 4. Asosiy Kontent (Kartalar yoki Jadval) */}
-      {filteredDirections.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-12 text-center">
-          <p className="text-base font-semibold text-gray-900">Yo'nalish topilmadi</p>
-          <p className="mt-1 text-sm text-gray-500">Qidiruv so'zini tekshiring yoki yangi yo'nalish qo'shing.</p>
-        </div>
-      ) : viewMode === "grid" ? (
-        /* KARTALAR REJIMI */
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {filteredDirections.map((item) => (
+      {/* Kartalar ko'rinishi */}
+      {viewMode === "cards" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDirections.map((dir) => (
             <div
-              key={item.id}
-              className="flex flex-col justify-between rounded-2xl border border-gray-200 bg-white p-5 shadow-xs hover:shadow-md transition"
+              key={dir.id}
+              className="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between"
             >
               <div>
-                {/* Teglar va Holat */}
-                <div className="flex items-center justify-between gap-2">
-                  <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700">
-                    {item.category}
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <span className="px-2.5 py-1 bg-neutral-100 text-neutral-700 text-xs font-medium rounded-lg">
+                    {dir.category}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                      {item.format}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] px-2 py-0.5 rounded-md bg-neutral-50 text-neutral-500 border border-neutral-200">
+                      {dir.format}
                     </span>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                        item.status === "active"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-600"
+                      className={`text-[11px] px-2 py-0.5 rounded-md font-medium ${
+                        dir.status === "Faol"
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-neutral-100 text-neutral-500"
                       }`}
                     >
-                      {item.status === "active" ? "Faol" : "Nofaol"}
+                      {dir.status}
                     </span>
                   </div>
                 </div>
 
-                {/* Sarlavha va Tavsif */}
-                <h3 className="mt-3 text-lg font-bold text-gray-900">{item.name}</h3>
-                <p className="mt-1.5 text-xs text-gray-600 line-clamp-2">{item.description}</p>
+                <h3 className="text-lg font-bold text-neutral-900 tracking-tight">{dir.title}</h3>
+                <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{dir.description}</p>
 
-                {/* O'rganiladigan texnologiyalar */}
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {item.technologies.slice(0, 4).map((tech) => (
+                {/* Texnologiyalar teglari */}
+                <div className="flex flex-wrap gap-1.5 mt-4">
+                  {dir.technologies.slice(0, 4).map((tech, idx) => (
                     <span
-                      key={tech}
-                      className="rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-[11px] font-medium text-gray-700"
+                      key={idx}
+                      className="px-2 py-0.5 bg-neutral-100 text-neutral-700 text-[11px] font-medium rounded-md"
                     >
                       {tech}
                     </span>
                   ))}
-                  {item.technologies.length > 4 && (
-                    <span className="text-[11px] font-medium text-gray-400 self-center">
-                      +{item.technologies.length - 4} yana
+                  {dir.technologies.length > 4 && (
+                    <span className="px-1.5 py-0.5 bg-neutral-50 text-neutral-400 text-[11px] rounded-md">
+                      +{dir.technologies.length - 4} yana
                     </span>
                   )}
                 </div>
-
-                {/* Narx va Davomiylik tafsilotlari */}
-                <div className="mt-4 rounded-xl bg-gray-50 p-3 text-xs space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500">Oylik to'lov:</span>
-                    <span className="font-bold text-gray-900 text-sm">
-                      {item.monthlyPrice.toLocaleString()} so'm
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-gray-600">
-                    <span>Davomiyligi:</span>
-                    <span className="font-medium">{item.durationMonths} oy ({item.lessonHoursPerWeek} soat/hafta)</span>
-                  </div>
-                  <div className="flex justify-between items-center text-gray-600">
-                    <span>Guruh va Talabalar:</span>
-                    <span className="font-medium text-indigo-600">
-                      {item.groupsCount} ta guruh / {item.studentsCount} ta o'quvchi
-                    </span>
-                  </div>
-                </div>
               </div>
 
-              {/* Pastki tugmalar */}
-              <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
-                <button
-                  onClick={() => setDetailItem(item)}
-                  className="text-xs font-semibold text-gray-600 hover:text-indigo-600"
-                >
-                  Batafsil ma'lumot
-                </button>
-                <div className="flex items-center gap-2">
+              <div className="mt-6 pt-4 border-t border-neutral-100">
+                <div className="flex justify-between items-center text-xs text-neutral-600 mb-1.5">
+                  <span>Oylik to'lov:</span>
+                  <span className="font-bold text-neutral-900 text-sm">
+                    {dir.monthlyPrice.toLocaleString("uz-UZ")} so'm
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs text-neutral-600 mb-1.5">
+                  <span>Davomiyligi:</span>
+                  <span className="font-medium text-neutral-800">
+                    {dir.durationMonths} oy ({dir.weeklyHours} soat/hafta)
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs text-neutral-600 mb-4">
+                  <span>Guruh va Talabalar:</span>
+                  <span className="font-medium text-neutral-900">
+                    {dir.groupsCount} ta guruh / {dir.studentsCount} ta o'quvchi
+                  </span>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2 border-t border-neutral-100 text-xs font-semibold">
                   <button
-                    onClick={() => handleOpenEdit(item)}
-                    className="rounded-lg px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50"
-                  >
-                    Tahrirlash
-                  </button>
-                  <button
-                    onClick={() => setDeletingItem(item)}
-                    className="rounded-lg px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-50"
+                    onClick={() => handleDelete(dir.id)}
+                    className="text-rose-600 hover:text-rose-800 transition"
                   >
                     O'chirish
                   </button>
@@ -491,68 +450,60 @@ const Directions: FC = () => {
           ))}
         </div>
       ) : (
-        /* JADVAL REJIMI */
-        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xs">
+        /* Jadval ko'rinishi */
+        <div className="bg-white border border-neutral-200 rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-600">
-              <thead className="border-b bg-gray-50 text-xs font-semibold uppercase text-gray-600">
+            <table className="w-full text-left text-sm text-neutral-600">
+              <thead className="bg-neutral-50 border-b border-neutral-200 text-xs uppercase font-semibold text-neutral-700">
                 <tr>
-                  <th className="px-6 py-3.5">Yo'nalish</th>
-                  <th className="px-6 py-3.5">Soha</th>
-                  <th className="px-6 py-3.5">Oylik to'lov</th>
-                  <th className="px-6 py-3.5">Davomiylik</th>
-                  <th className="px-6 py-3.5">Guruh / Talabalar</th>
-                  <th className="px-6 py-3.5">Holati</th>
-                  <th className="px-6 py-3.5 text-right">Amallar</th>
+                  <th className="px-6 py-4">Yo'nalish</th>
+                  <th className="px-6 py-4">Soha</th>
+                  <th className="px-6 py-4">Texnologiyalar</th>
+                  <th className="px-6 py-4">Oylik to'lov</th>
+                  <th className="px-6 py-4">Davomiylik / Soat</th>
+                  <th className="px-6 py-4">Holat</th>
+                  <th className="px-6 py-4 text-right">Amal</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredDirections.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50/70 transition">
+              <tbody className="divide-y divide-neutral-200">
+                {filteredDirections.map((dir) => (
+                  <tr key={dir.id} className="hover:bg-neutral-50/50 transition">
+                    <td className="px-6 py-4 font-semibold text-neutral-900">{dir.title}</td>
                     <td className="px-6 py-4">
-                      <p className="font-bold text-gray-900">{item.name}</p>
-                      <p className="text-xs text-gray-400">{item.format} • {item.level}</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700">
-                        {item.category}
+                      <span className="px-2 py-0.5 bg-neutral-100 text-neutral-700 text-xs rounded-md">
+                        {dir.category}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-semibold text-gray-900">
-                      {item.monthlyPrice.toLocaleString()} so'm
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-1 max-w-xs">
+                        {dir.technologies.slice(0, 3).map((t, idx) => (
+                          <span key={idx} className="text-xs px-2 py-0.5 bg-neutral-100 rounded">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-xs">
-                      {item.durationMonths} oy ({item.lessonHoursPerWeek} soat/h)
+                    <td className="px-6 py-4 font-medium text-neutral-900">
+                      {dir.monthlyPrice.toLocaleString("uz-UZ")} so'm
                     </td>
-                    <td className="px-6 py-4 text-xs">
-                      <span className="font-semibold text-indigo-600">{item.groupsCount} ta</span> guruh /{" "}
-                      <span className="font-semibold text-purple-600">{item.studentsCount} ta</span> talaba
+                    <td className="px-6 py-4 text-neutral-700">
+                      {dir.durationMonths} oy / {dir.weeklyHours} soat
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          item.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
+                        className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                          dir.status === "Faol"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-neutral-100 text-neutral-500"
                         }`}
                       >
-                        {item.status === "active" ? "Faol" : "Nofaol"}
+                        {dir.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
-                        onClick={() => setDetailItem(item)}
-                        className="mr-2 text-xs font-medium text-gray-600 hover:text-indigo-600"
-                      >
-                        Ko'rish
-                      </button>
-                      <button
-                        onClick={() => handleOpenEdit(item)}
-                        className="mr-2 text-xs font-semibold text-indigo-600 hover:underline"
-                      >
-                        Tahrirlash
-                      </button>
-                      <button
-                        onClick={() => setDeletingItem(item)}
-                        className="text-xs font-semibold text-red-600 hover:underline"
+                        onClick={() => handleDelete(dir.id)}
+                        className="text-xs font-semibold text-rose-600 hover:text-rose-800"
                       >
                         O'chirish
                       </button>
@@ -565,261 +516,187 @@ const Directions: FC = () => {
         </div>
       )}
 
-      {/* 5. Qo'shish va Tahrirlash Modali */}
+      {/* Yangi yo'nalish qo'shish modali (Autocomplete takliflar bilan) */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-gray-900">
-              {editingItem ? "Yo'nalishni tahrirlash" : "Yangi yo'nalish qo'shish"}
-            </h2>
-            {formError && <p className="mt-2 text-xs font-semibold text-red-500">{formError}</p>}
-
-            <form onSubmit={handleSave} className="mt-5 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700">Yo'nalish nomi *</label>
-                  <input
-                    type="text"
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    placeholder="Masalan: Frontend Dasturlash"
-                    className="mt-1 w-full rounded-xl border border-gray-300 px-3.5 py-2 text-sm outline-none focus:border-indigo-600"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700">Soha / Kategoriya</label>
-                  <select
-                    value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2 text-sm outline-none focus:border-indigo-600"
-                  >
-                    <option value="Dasturlash">Dasturlash</option>
-                    <option value="Dizayn">Dizayn</option>
-                    <option value="Mobil">Mobil dasturlash</option>
-                    <option value="Boshlang'ich">Boshlang'ich IT</option>
-                    <option value="Marketing">Marketing</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700">Tavsifi</label>
-                <textarea
-                  rows={2}
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  placeholder="Yo'nalish haqida qisqacha ma'lumot..."
-                  className="mt-1 w-full rounded-xl border border-gray-300 px-3.5 py-2 text-sm outline-none focus:border-indigo-600"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700">
-                  O'rganiladigan texnologiyalar (vergul bilan ajrating)
-                </label>
-                <input
-                  type="text"
-                  value={formTechs}
-                  onChange={(e) => setFormTechs(e.target.value)}
-                  placeholder="Masalan: HTML, CSS, JavaScript, React, Next.js"
-                  className="mt-1 w-full rounded-xl border border-gray-300 px-3.5 py-2 text-sm outline-none focus:border-indigo-600"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700">Davomiyligi (oy)</label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={formDuration}
-                    onChange={(e) => setFormDuration(Number(e.target.value))}
-                    className="mt-1 w-full rounded-xl border border-gray-300 p-2 text-sm outline-none focus:border-indigo-600"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700">Haftalik soat</label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={formHours}
-                    onChange={(e) => setFormHours(Number(e.target.value))}
-                    className="mt-1 w-full rounded-xl border border-gray-300 p-2 text-sm outline-none focus:border-indigo-600"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700">Oylik to'lov (so'm)</label>
-                  <input
-                    type="number"
-                    step={50000}
-                    value={formPrice}
-                    onChange={(e) => setFormPrice(Number(e.target.value))}
-                    className="mt-1 w-full rounded-xl border border-gray-300 p-2 text-sm outline-none focus:border-indigo-600"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700">Chegirma (%)</label>
-                  <input
-                    type="number"
-                    min={0}
-                    max={100}
-                    value={formDiscount}
-                    onChange={(e) => setFormDiscount(Number(e.target.value))}
-                    className="mt-1 w-full rounded-xl border border-gray-300 p-2 text-sm outline-none focus:border-indigo-600"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700">Dars formati</label>
-                  <select
-                    value={formFormat}
-                    onChange={(e) => setFormFormat(e.target.value as CourseFormat)}
-                    className="mt-1 w-full rounded-xl border border-gray-300 bg-white p-2 text-sm outline-none"
-                  >
-                    <option value="Oflayn">Oflayn</option>
-                    <option value="Onlayn">Onlayn</option>
-                    <option value="Gibrid">Gibrid</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700">Daraja (Level)</label>
-                  <select
-                    value={formLevel}
-                    onChange={(e) => setFormLevel(e.target.value as CourseLevel)}
-                    className="mt-1 w-full rounded-xl border border-gray-300 bg-white p-2 text-sm outline-none"
-                  >
-                    <option value="Boshlang'ich">Boshlang'ich</option>
-                    <option value="O'rta">O'rta</option>
-                    <option value="Murakkab">Murakkab</option>
-                    <option value="Barchaga">Barchaga</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700">Holati</label>
-                  <select
-                    value={formStatus}
-                    onChange={(e) => setFormStatus(e.target.value as DirectionStatus)}
-                    className="mt-1 w-full rounded-xl border border-gray-300 bg-white p-2 text-sm outline-none"
-                  >
-                    <option value="active">Faol (qabul ochiq)</option>
-                    <option value="inactive">Nofaol (to'xtatilgan)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Bekor qilish
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-xl bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
-                >
-                  Saqlash
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 6. Batafsil ko'rish Modali (Detail View) */}
-      {detailItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-            <div className="flex items-start justify-between border-b pb-3">
-              <div>
-                <span className="text-xs font-semibold uppercase text-indigo-600">{detailItem.category}</span>
-                <h2 className="text-xl font-bold text-gray-900">{detailItem.name}</h2>
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div className="flex items-center justify-between pb-4 border-b border-neutral-100">
+              <h2 className="text-xl font-bold text-neutral-900">Yangi yo'nalish yaratish</h2>
               <button
-                onClick={() => setDetailItem(null)}
-                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100"
+                onClick={() => setIsModalOpen(false)}
+                className="text-neutral-400 hover:text-neutral-700 text-lg font-bold"
               >
                 ✕
               </button>
             </div>
 
-            <p className="mt-3 text-sm text-gray-600">{detailItem.description}</p>
+            <form onSubmit={handleCreateDirection} className="space-y-5 mt-6">
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 uppercase mb-2">
+                  Yo'nalish nomi *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Masalan: Frontend Pro, SAT Matematika"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                />
+              </div>
 
-            <div className="mt-4 space-y-2 rounded-xl bg-gray-50 p-4 text-xs">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Oylik to'lov:</span>
-                <strong className="text-gray-900">{detailItem.monthlyPrice.toLocaleString()} so'm</strong>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Davomiyligi:</span>
-                <span className="font-medium text-gray-800">{detailItem.durationMonths} oy ({detailItem.lessonHoursPerWeek} soat/hafta)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Format va Daraja:</span>
-                <span className="font-medium text-gray-800">{detailItem.format} • {detailItem.level}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Mavjud guruhlar soni:</span>
-                <span className="font-bold text-indigo-600">{detailItem.groupsCount} ta guruh</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">O'qiyotgan talabalar:</span>
-                <span className="font-bold text-purple-600">{detailItem.studentsCount} nafar</span>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <p className="text-xs font-semibold text-gray-700">Texnologiyalar ro'yxati:</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {detailItem.technologies.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-lg bg-indigo-50 border border-indigo-100 px-2.5 py-1 text-xs font-medium text-indigo-700"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-700 uppercase mb-2">
+                    Soha
+                  </label>
+                  <select
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value as Direction["category"])}
+                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none"
                   >
-                    {t}
-                  </span>
-                ))}
+                    <option value="Dasturlash">Dasturlash</option>
+                    <option value="Dizayn">Dizayn</option>
+                    <option value="Mobil">Mobil</option>
+                    <option value="Boshlang'ich">Boshlang'ich</option>
+                    <option value="Aniq fanlar">Aniq fanlar</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-700 uppercase mb-2">
+                    Format
+                  </label>
+                  <select
+                    value={newFormat}
+                    onChange={(e) => setNewFormat(e.target.value as Direction["format"])}
+                    className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none"
+                  >
+                    <option value="Gibrid">Gibrid</option>
+                    <option value="Oflayn">Oflayn</option>
+                    <option value="Onlayn">Onlayn</option>
+                  </select>
+                </div>
               </div>
-            </div>
 
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() => setDetailItem(null)}
-                className="rounded-xl bg-gray-900 px-5 py-2 text-xs font-semibold text-white hover:bg-gray-800"
-              >
-                Yopish
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              {/* 3-rasmdagi O'rganiladigan texnologiyalar inputi (Avtomatik takliflar bilan) */}
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 uppercase mb-1">
+                  O'rganiladigan texnologiyalar (Autocomplete)
+                </label>
+                <p className="text-[11px] text-neutral-400 mb-2">
+                  1-harfdan yozing va pastdagi takliflardan tanlang
+                </p>
 
-      {/* 7. O'chirish Modali */}
-      {deletingItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="font-bold text-gray-900">O'chirishni tasdiqlang</h3>
-            <p className="mt-2 text-sm text-gray-600">
-              "{deletingItem.name}" yo'nalishini o'chirib tashlamoqchimisiz?
-            </p>
-            <div className="mt-5 flex justify-end gap-3">
-              <button
-                onClick={() => setDeletingItem(null)}
-                className="rounded-xl border px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-              >
-                Yo'q
-              </button>
-              <button
-                onClick={handleDelete}
-                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
-              >
-                Ha, o'chirilsin
-              </button>
-            </div>
+                {/* Tanlangan teglarni chiqarish */}
+                <div className="flex flex-wrap gap-2 mb-2 p-2 bg-neutral-50 rounded-xl border border-neutral-200 min-h-[42px] items-center">
+                  {selectedTechs.map((t) => (
+                    <span
+                      key={t}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-neutral-200 rounded-lg text-xs font-medium text-neutral-800 shadow-xs"
+                    >
+                      {t}
+                      <button
+                        type="button"
+                        onClick={() => removeTechTag(t)}
+                        className="text-neutral-400 hover:text-rose-600 font-bold"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={techInput}
+                    onChange={(e) => setTechInput(e.target.value)}
+                    placeholder="Qidiring: masalan R, P, F, S..."
+                    className="flex-1 bg-transparent border-none text-xs focus:outline-none p-1 min-w-[140px]"
+                  />
+                </div>
+
+                {/* Pastda chiquvchi takliflar ro'yxati */}
+                {techSuggestions.length > 0 && (
+                  <div className="p-2 bg-white border border-neutral-200 rounded-xl shadow-lg flex flex-wrap gap-1.5 max-h-36 overflow-y-auto">
+                    {techSuggestions.map((suggestion) => (
+                      <button
+                        type="button"
+                        key={suggestion}
+                        onClick={() => addTechTag(suggestion)}
+                        className="px-3 py-1 rounded-lg text-xs bg-neutral-100 hover:bg-neutral-900 hover:text-white transition font-medium"
+                      >
+                        + {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Narx va soatlar */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-700 uppercase mb-1">
+                    Davomiyligi (oy)
+                  </label>
+                  <input
+                    type="number"
+                    value={newDuration}
+                    onChange={(e) => setNewDuration(e.target.value)}
+                    className="w-full px-4 py-2 rounded-xl border border-neutral-200 text-sm focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-700 uppercase mb-1">
+                    Haftalik soat
+                  </label>
+                  <input
+                    type="number"
+                    value={newWeeklyHours}
+                    onChange={(e) => setNewWeeklyHours(e.target.value)}
+                    className="w-full px-4 py-2 rounded-xl border border-neutral-200 text-sm focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-700 uppercase mb-1">
+                    Oylik to'lov (so'm)
+                  </label>
+                  <input
+                    type="number"
+                    value={newMonthlyPrice}
+                    onChange={(e) => setNewMonthlyPrice(e.target.value)}
+                    className="w-full px-4 py-2 rounded-xl border border-neutral-200 text-sm focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 uppercase mb-2">
+                  Qisqacha tavsif
+                </label>
+                <textarea
+                  rows={2}
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 text-sm focus:outline-none"
+                  placeholder="Kurs talabalari qanday natijalarga erishishi haqida..."
+                ></textarea>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl text-neutral-600 hover:bg-neutral-100 text-sm font-medium"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-neutral-900 hover:bg-black text-white text-sm font-medium rounded-xl transition shadow-sm"
+                >
+                  Yo'nalishni saqlash
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -827,4 +704,4 @@ const Directions: FC = () => {
   );
 };
 
-export default Directions;
+export default DirectionsPage;
