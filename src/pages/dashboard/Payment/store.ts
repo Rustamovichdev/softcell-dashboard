@@ -21,14 +21,16 @@ export const usePaymentsStore = create<PaymentsState>()(
           const nextId = state.payments.length
             ? Math.max(...state.payments.map(({ id }) => id)) + 1
             : 1;
+          // Sana va vaqt foydalanuvchi kiritmaydi — tizim to'ldiradi
+          const now = new Date().toISOString();
           return {
             payments: [
               {
                 id: nextId,
                 ...values,
-                dueDate: values.dueDate || new Date().toISOString(),
-                paidAt: values.status === "completed" ? new Date().toISOString() : "",
-                createdAt: new Date().toISOString(),
+                dueDate: now,
+                paidAt: values.status === "completed" ? now : "",
+                createdAt: now,
               },
               ...state.payments,
             ],

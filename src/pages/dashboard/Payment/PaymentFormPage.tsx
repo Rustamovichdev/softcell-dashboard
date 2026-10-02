@@ -78,7 +78,6 @@ const PaymentFormPage: FC = () => {
       paidAmount: 0,
       month: 1,
       totalMonths: 6,
-      dueDate: "",
     },
   });
 

@@ -36,9 +36,6 @@ export const statusLabels: Record<GroupStatus, string> = {
   completed: "Completed",
 };
 
-/** Guruh o'quvchilari (qo'lda kiritilgan ismlar) */
-export const getGroupStudentNames = (group: Group) => group.students;
-
 /** Guruh o'qituvchisining to'liq ismi (avval qo'lda kiritilgan, keyin ro'yxatdan) */
 export const getGroupTeacherName = (group: Group) => {
   if (group.teacherName) return group.teacherName;
@@ -54,7 +51,7 @@ const getLessonsPerWeek = (scheduleType: GroupScheduleType) =>
  * Guruh tugash sanasi: startDate + darslar soni va chastotasidan hisoblanadi.
  * (End Date alohida kiritilmaydi — foydalanuvchi shuni olib tashladi)
  */
-export const getGroupEndDate = (
+const getGroupEndDate = (
   group: Pick<Group, "startDate" | "lessonCount" | "scheduleType">,
 ) => {
   const start = new Date(group.startDate);
