@@ -16,28 +16,21 @@ export type Payment = {
   status: PaymentStatus;
   method: PaymentMethod;
   description: string;
+  /** To'langan sana (bo'lmasa bo'sh) */
   paidAt: string;
+  /** To'lov saqlangan sana va vaqti */
   createdAt: string;
+  /** To'lanishi kerak summa */
   dueAmount: number;
+  /** To'langan summa */
   paidAmount: number;
-  month: number;        // 1-12 (qaysi oy uchun to'lov)
-  totalMonths: number;  // kurs umumiy davomiyligi (masalan 6 oy)
-  dueDate: string;      // to'lov qilinishi kerak sana (ISO)
+  /** Qaysi oy uchun to'lov (1-12) */
+  month: number;
+  /** Kurs umumiy davomiyligi (masalan 6 oy) */
+  totalMonths: number;
+  /** To'lov muddati — oylik jadval uchun tizim tomonidan hisoblanadi */
+  dueDate: string;
 };
 
-export type PaymentFormValues = Omit<Payment, "id" | "createdAt" | "paidAt" | "dueDate"> & {
-  /** To'lov muddati (ISO sana) - bo'lmasa joriy oyga hisoblanadi */
-  dueDate?: string;
-};
-
-/** O'quvchi uchun to'lov jadvali (har bir oy uchun) */
-export type PaymentSchedule = {
-  month: number;           // 1, 2, 3...
-  dueDate: string;         // to'lov muddati
-  dueAmount: number;       // to'lanishi kerak summa
-  paidAmount: number;      // to'langan summa
-  status: PaymentStatus;   // status
-  paidAt?: string;         // to'langan sana
-  method?: PaymentMethod;  // to'lov usuli
-  paymentId?: number;      // payment record ID
-};
+/** Forma maydonlari (id, sanalar va tizim maydonlari kiritilmaydi) */
+export type PaymentFormValues = Omit<Payment, "id" | "createdAt" | "paidAt" | "dueDate">;
