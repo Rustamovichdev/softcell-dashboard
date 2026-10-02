@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, type FormEvent } from "react";
-
+import { createPortal } from "react-dom";
+ 
 type Lead = {
   id: number;
   fullName: string;
@@ -10,7 +11,7 @@ type Lead = {
   phone: string;
   telegram: string;
 };
-
+ 
 const INITIAL_LEADS: Lead[] = [
   {
     id: 1,
@@ -43,7 +44,7 @@ const INITIAL_LEADS: Lead[] = [
     telegram: "https://t.me/jasur",
   },
 ];
-
+ 
 const normalizeTelegram = (value: string) => {
   const v = value.trim();
   if (/^https?:\/\//i.test(v)) return v;
@@ -51,15 +52,33 @@ const normalizeTelegram = (value: string) => {
   if (v.startsWith("t.me/")) return `https://${v}`;
   return `https://t.me/${v}`;
 };
-
+ 
 const PAGE_SIZE = 5;
-
+ 
+// Yo'nalish tanlash uchun kompyuter kurslari
+const COURSES = [
+  "Kompyuter savodxonligi",
+  "Frontend (HTML, CSS, JavaScript)",
+  "Backend",
+  "Python",
+  "Mobil dasturlash",
+  "Web dizayn (UI/UX)",
+  "Grafik dizayn",
+  "Video montaj",
+  "Kiberxavfsizlik",
+  "Ma'lumotlar tahlili",
+  "Sun'iy intellekt",
+  "Robototexnika",
+  "Scratch (bolalar uchun)",
+  "Boshqa",
+];
+ 
 const Leads = () => {
   const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
-
+ 
   const [fullName, setFullName] = useState("");
   const [age, setAge] = useState("");
   const [direction, setDirection] = useState("");
@@ -67,11 +86,11 @@ const Leads = () => {
   const [startUpDesc, setStartUpDesc] = useState("");
   const [phone, setPhone] = useState("");
   const [telegram, setTelegram] = useState("");
-
+ 
   // Bir marta yuborishni ta'minlaydi (ikki marta bosishdan himoya)
   const submittedRef = useRef(false);
   const [submitted, setSubmitted] = useState(false);
-
+ 
   const filteredLeads = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return leads;
@@ -86,14 +105,14 @@ const Leads = () => {
         lead.telegram.toLowerCase().includes(q)
     );
   }, [leads, query]);
-
+ 
   const totalPages = Math.max(1, Math.ceil(filteredLeads.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const pageLeads = filteredLeads.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
-
+ 
   const openForm = () => {
     setFullName("");
     setAge("");
@@ -106,15 +125,15 @@ const Leads = () => {
     setSubmitted(false);
     setOpen(true);
   };
-
+ 
   const closeForm = () => setOpen(false);
-
+ 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (submittedRef.current) return;
     submittedRef.current = true;
     setSubmitted(true);
-
+ 
     setLeads((prev) => [
       ...prev,
       {
@@ -132,7 +151,7 @@ const Leads = () => {
     setPage(1);
     setOpen(false);
   };
-
+ 
   return (
     <div className="leads">
       <style>{`
@@ -143,30 +162,30 @@ const Leads = () => {
           color: #111827;
           box-sizing: border-box;
         }
-
+ 
         .leads__title {
           font-size: 24px;
           font-weight: 700;
           margin: 0;
         }
-
+ 
         .leads__subtitle {
           color: #6b7280;
           font-size: 14px;
           margin: 4px 0 20px;
         }
-
+ 
         .leads__toolbar {
           display: flex;
           gap: 12px;
           margin-bottom: 20px;
         }
-
+ 
         .leads__search {
           position: relative;
           flex: 1;
         }
-
+ 
         .leads__search svg {
           position: absolute;
           left: 14px;
@@ -174,7 +193,7 @@ const Leads = () => {
           transform: translateY(-50%);
           color: #9ca3af;
         }
-
+ 
         .leads__search input {
           width: 100%;
           box-sizing: border-box;
@@ -187,12 +206,12 @@ const Leads = () => {
           background: #fff;
           transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
-
+ 
         .leads__search input:focus {
           border-color: #111827;
           box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
         }
-
+ 
         .leads__add-btn {
           flex-shrink: 0;
           border: none;
@@ -205,11 +224,11 @@ const Leads = () => {
           cursor: pointer;
           transition: background 0.15s ease;
         }
-
+ 
         .leads__add-btn:hover {
           background: #1f2937;
         }
-
+ 
         .leads__empty {
           color: #6b7280;
           font-size: 15px;
@@ -219,7 +238,7 @@ const Leads = () => {
           border-radius: 12px;
           border: 1px solid #eef0f2;
         }
-
+ 
         .leads__table-wrap {
           width: 100%;
           overflow-x: auto;
@@ -228,17 +247,17 @@ const Leads = () => {
           border: 1px solid #eef0f2;
           background: #fff;
         }
-
+ 
         .leads__table {
           width: 100%;
           min-width: 1000px;
           border-collapse: collapse;
         }
-
+ 
         .leads__table thead {
           background: #f9fafb;
         }
-
+ 
         .leads__table th,
         .leads__table td {
           padding: 14px 20px;
@@ -246,7 +265,7 @@ const Leads = () => {
           font-size: 14px;
           vertical-align: top;
         }
-
+ 
         .leads__table th {
           font-weight: 600;
           font-size: 11px;
@@ -256,37 +275,37 @@ const Leads = () => {
           border-bottom: 1px solid #eef0f2;
           white-space: nowrap;
         }
-
+ 
         .leads__table tbody tr {
           border-bottom: 1px solid #f3f4f6;
         }
-
+ 
         .leads__table tbody tr:last-child {
           border-bottom: none;
         }
-
+ 
         .leads__table tbody tr:hover {
           background: #fafafa;
         }
-
+ 
         .leads__table td:nth-child(2) {
           font-weight: 600;
         }
-
+ 
         .leads__table td:nth-child(5) {
           min-width: 220px;
           color: #4b5563;
         }
-
+ 
         .leads__table a {
           color: #2563eb;
           text-decoration: none;
         }
-
+ 
         .leads__table a:hover {
           text-decoration: underline;
         }
-
+ 
         .leads__age {
           display: block;
           color: #6b7280;
@@ -294,7 +313,7 @@ const Leads = () => {
           font-weight: 400;
           margin-top: 2px;
         }
-
+ 
         .leads__pagination {
           display: flex;
           align-items: center;
@@ -302,7 +321,7 @@ const Leads = () => {
           gap: 8px;
           margin-top: 20px;
         }
-
+ 
         .leads__page-btn {
           min-width: 34px;
           height: 34px;
@@ -319,26 +338,26 @@ const Leads = () => {
           padding: 0 10px;
           transition: background 0.15s ease, color 0.15s ease;
         }
-
+ 
         .leads__page-btn:hover:not(:disabled) {
           background: #f3f4f6;
         }
-
+ 
         .leads__page-btn:disabled {
           opacity: 0.4;
           cursor: not-allowed;
         }
-
+ 
         .leads__page-btn--active {
           background: #111827;
           border-color: #111827;
           color: #fff;
         }
-
+ 
         .leads__page-btn--active:hover {
           background: #111827;
         }
-
+ 
         .leads__overlay {
           position: fixed;
           inset: 0;
@@ -347,9 +366,9 @@ const Leads = () => {
           align-items: center;
           justify-content: center;
           padding: 16px;
-          z-index: 50;
+          z-index: 9999;
         }
-
+ 
         .leads__form {
           position: relative;
           display: flex;
@@ -365,7 +384,7 @@ const Leads = () => {
           box-sizing: border-box;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
-
+ 
         .leads__close {
           position: absolute;
           top: 12px;
@@ -379,16 +398,29 @@ const Leads = () => {
           cursor: pointer;
           border-radius: 6px;
         }
-
+ 
         .leads__close:hover {
           background: #f3f4f6;
           color: #374151;
         }
-
+ 
         .leads__close::before {
           content: "\\2715";
         }
-
+ 
+        .modal-content {
+          display: block;
+          width: 100%;
+        }
+ 
+        .form-title {
+          display: block;
+          width: 100%;
+          margin: 0 0 20px 0;
+          font-size: 20px;
+          font-weight: 600;
+        }
+ 
         .leads__left,
         .leads__right {
           flex: 1 1 260px;
@@ -396,7 +428,7 @@ const Leads = () => {
           flex-direction: column;
           gap: 14px;
         }
-
+ 
         .leads__form input[type="text"],
         .leads__form input[type="tel"],
         .leads__form textarea {
@@ -408,19 +440,51 @@ const Leads = () => {
           outline: none;
           transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
-
+ 
         .leads__form input[type="text"]:focus,
         .leads__form input[type="tel"]:focus,
         .leads__form textarea:focus {
           border-color: #111827;
           box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
         }
-
+ 
         .leads__form textarea {
           min-height: 100px;
           resize: vertical;
         }
-
+ 
+        .leads__form select {
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          padding: 10px 36px 10px 12px;
+          font-size: 14px;
+          font-family: inherit;
+          color: #111827;
+          background-color: #fff;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          appearance: none;
+          -webkit-appearance: none;
+          outline: none;
+          cursor: pointer;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+ 
+        .leads__form select:focus {
+          border-color: #111827;
+          box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+        }
+ 
+        /* Hali tanlanmagan holatda placeholder rangi */
+        .leads__form select:invalid {
+          color: #9ca3af;
+        }
+ 
+        .leads__form select option {
+          color: #111827;
+        }
+ 
         .leads__submit {
           margin-top: auto;
           border: none;
@@ -433,51 +497,51 @@ const Leads = () => {
           cursor: pointer;
           transition: background 0.15s ease;
         }
-
+ 
         .leads__submit:hover:not(:disabled) {
           background: #1f2937;
         }
-
+ 
         .leads__submit:disabled {
           background: #9ca3af;
           cursor: not-allowed;
         }
-
+ 
         @media (max-width: 768px) {
           .leads {
             padding: 24px 16px 48px;
           }
-
+ 
           .leads__title {
             font-size: 20px;
           }
-
+ 
           .leads__table th,
           .leads__table td {
             padding: 10px 14px;
             font-size: 13px;
           }
-
+ 
           .leads__form {
             width: 90vw;
             max-width: 90vw;
           }
         }
-
+ 
         @media (max-width: 480px) {
           .leads__toolbar {
             flex-direction: column;
           }
-
+ 
           .leads__add-btn {
             padding: 11px 20px;
           }
-
+ 
           .leads__overlay {
             padding: 12px;
             align-items: flex-end;
           }
-
+ 
           .leads__form {
             flex-direction: column;
             gap: 16px;
@@ -485,35 +549,16 @@ const Leads = () => {
             width: 100%;
             max-width: 100%;
           }
-
+ 
           .leads__submit {
             width: 100%;
           }
         }
-.modal-content {
-  display: block;      /* yonma-yon emas, tepadan pastga */
-  width: 100%;
-}
-
-.form-title {
-  display: block;
-  width: 100%;
-  margin: 0 0 20px 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-        
       `}</style>
-
+ 
       <h1 className="leads__title">O'quvchilar ro'yxati</h1>
       <p className="leads__subtitle">Jami: {leads.length} ta o'quvchi</p>
-
+ 
       <div className="leads__toolbar">
         <div className="leads__search">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -534,7 +579,7 @@ const Leads = () => {
           + Qo'shish
         </button>
       </div>
-
+ 
       {filteredLeads.length === 0 ? (
         <p className="leads__empty">Hozircha ro'yxat bo'sh</p>
       ) : (
@@ -574,7 +619,7 @@ const Leads = () => {
               </tbody>
             </table>
           </div>
-
+ 
           {totalPages > 1 && (
             <div className="leads__pagination">
               <button
@@ -612,27 +657,27 @@ const Leads = () => {
           )}
         </>
       )}
-
-      {open && (
-        <div className="leads__overlay" onClick={closeForm}>
-          <form
-            className="leads__form"
-            onClick={(e) => e.stopPropagation()}
-            onSubmit={handleSubmit}
-          >
+ 
+      {open &&
+        createPortal(
+        // Kulrang joyga bosganda yopilmaydi, faqat X tugmasi orqali yopiladi
+        <div
+          className="leads__overlay"
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <form className="leads__form" onSubmit={handleSubmit}>
             <button
               type="button"
               className="leads__close"
               onClick={closeForm}
               aria-label="Yopish"
             />
-     <div className="modal-content">
-  <h2 className="form-title">Ma'lumotlarni kiriting</h2>
-
-  <form className="form-grid">
-    {/* barcha inputlar va "Kiritish" tugmasi shu yerda */}
-  </form>
-</div>
+ 
+            <div className="modal-content">
+              <h2 className="form-title">Ma'lumotlarni kiriting</h2>
+            </div>
+ 
             <div className="leads__left">
               <input
                 type="text"
@@ -648,13 +693,20 @@ const Leads = () => {
                 onChange={(e) => setAge(e.target.value)}
                 required
               />
-              <input
-                type="text"
-                placeholder="Yo'nalish (qaysi yo'nalishga qiziqyapti)"
+              <select
                 value={direction}
                 onChange={(e) => setDirection(e.target.value)}
                 required
-              />
+              >
+                <option value="" disabled>
+                  Yo'nalish (qaysi kursga qiziqyapti)
+                </option>
+                {COURSES.map((course) => (
+                  <option key={course} value={course}>
+                    {course}
+                  </option>
+                ))}
+              </select>
               <input
                 type="tel"
                 placeholder="+998 ** *** ** **"
@@ -665,25 +717,25 @@ const Leads = () => {
                     .replace(/^\+998/, "")
                     .replace(/[^0-9]/g, "")
                     .slice(0, 9);
-
+ 
                   if (digits.length === 0) {
                     setPhone("");
                     return;
                   }
-
+ 
                   const parts = [
                     digits.slice(0, 2),
                     digits.slice(2, 5),
                     digits.slice(5, 7),
                     digits.slice(7, 9),
                   ].filter(Boolean);
-
+ 
                   setPhone(`+998 ${parts.join(" ")}`.trimEnd());
                 }}
                 required
               />
             </div>
-
+ 
             <div className="leads__right">
               <input
                 type="text"
@@ -705,7 +757,7 @@ const Leads = () => {
                 onChange={(e) => setTelegram(e.target.value)}
                 required
               />
-
+ 
               <button
                 type="submit"
                 className="leads__submit"
@@ -715,10 +767,12 @@ const Leads = () => {
               </button>
             </div>
           </form>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
 };
-
+ 
 export default Leads;
+ 
