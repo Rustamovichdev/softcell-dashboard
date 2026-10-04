@@ -3,10 +3,11 @@ import Pagination from "./components/Pagination";
 import StudentsTable from "./components/StudentsTable";
 import StudentsToolbar from "./components/StudentsToolbar";
 import NewStudent from "./NewStudent";
-import { MOCK_STUDENTS, PAGE_SIZE } from "./data";
+import { MOCK_STUDENTS } from "./data";
 import type { Student, StudentFormValues } from "./types";
 
 const STUDENTS_STORAGE_KEY = "softcell_students";
+const PAGE_SIZE_STORAGE_KEY = "softcell_students_page_size";
 
 const Students: FC = () => {
   const [students, setStudents] = useState<Student[]>(() => {
@@ -22,6 +23,18 @@ const Students: FC = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
+
+  // Tanlangan qator sonini localStorage dan o'qiydi (agar saqlanmagan bo'lsa default 10)
+  const [pageSize, setPageSize] = useState<number>(() => {
+    const savedSize = localStorage.getItem(PAGE_SIZE_STORAGE_KEY);
+    if (savedSize) {
+      const parsed = Number(savedSize);
+      if (!isNaN(parsed) && parsed > 0) {
+        return parsed;
+      }
+    }
+    return 10;
+  });
 
   const [isNewPage, setIsNewPage] = useState(
     window.location.pathname === "/students/new",
@@ -106,22 +119,30 @@ const Students: FC = () => {
       ),
   );
 
+  // Tanlangan pageSize (5, 10, 15, 20) bo'yicha sahifalar soni
   const totalPages = Math.max(
     1,
-    Math.ceil(filtered.length / PAGE_SIZE),
+    Math.ceil(filtered.length / pageSize),
   );
 
   const currentPage = Math.min(page, totalPages);
 
-  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const startIndex = (currentPage - 1) * pageSize;
 
   const visibleStudents = filtered.slice(
     startIndex,
-    startIndex + PAGE_SIZE,
+    startIndex + pageSize,
   );
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
+    setPage(1);
+  };
+
+  // Qator soni tanlanganda darhol localStorage ga saqlab qo'yadi
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(newSize));
     setPage(1);
   };
 
@@ -150,6 +171,9 @@ const Students: FC = () => {
         page={currentPage}
         totalPages={totalPages}
         onChange={setPage}
+        pageSize={pageSize}
+        onPageSizeChange={handlePageSizeChange}
+        totalItems={filtered.length}
       />
     </section>
   );
