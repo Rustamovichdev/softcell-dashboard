@@ -69,6 +69,12 @@ export const appRoutes: AppRoute[] = [
     component: lazy(() => import("../pages/dashboard/Leads")),
   },
   {
+    path: "/call-center",
+    label: "Call Center",
+    icon: "call",
+    component: lazy(() => import("../pages/dashboard/CallCenter")),
+  },
+  {
     path: "/students",
     label: "Students",
     icon: "students",
