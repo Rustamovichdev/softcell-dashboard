@@ -50,7 +50,7 @@ const GroupsToolbar: FC<GroupsToolbarProps> = ({
     <button
       type="button"
       onClick={onAdd}
-      className="h-10 rounded-lg bg-gray-900 px-4 text-sm font-medium whitespace-nowrap text-white transition hover:bg-gray-800"
+      className="h-10 rounded-lg bg-emerald-600 px-4 text-sm font-medium whitespace-nowrap text-white transition hover:bg-emerald-700"
     >
       + Add Group
     </button>

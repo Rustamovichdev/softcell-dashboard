@@ -135,10 +135,10 @@ const GroupFormPage: FC = () => {
           {editingGroup ? "Guruhni tahrirlash" : "Yangi guruh qo'shish"}
         </h1>
         <div className="flex items-center gap-3">
-          <Button type="button" variant="outline" onClick={onCancel} className="h-11">
+          <Button type="button" variant="outlineDanger" onClick={onCancel} className="h-11">
             Bekor qilish
           </Button>
-          <Button type="submit" form={FORM_ID} className="h-11">
+          <Button type="submit" variant="accent" form={FORM_ID} className="h-11">
             Saqlash
           </Button>
         </div>
@@ -283,7 +283,7 @@ const GroupFormPage: FC = () => {
               onClick={() => setValue("time", preset)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
                 time === preset
-                  ? "border-gray-900 bg-gray-900 text-white"
+                  ? "border-emerald-600 bg-emerald-600 text-white"
                   : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
               }`}
             >

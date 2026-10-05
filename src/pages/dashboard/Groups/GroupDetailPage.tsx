@@ -81,7 +81,7 @@ const GroupDetailPage: FC = () => {
           <Button variant="outline" onClick={() => navigate("/groups")} className="h-11">
             Orqaga
           </Button>
-          <Button onClick={() => navigate(`/groups/${group.id}/edit`)} className="h-11">
+          <Button variant="accent" onClick={() => navigate(`/groups/${group.id}/edit`)} className="h-11">
             Tahrirlash
           </Button>
         </div>

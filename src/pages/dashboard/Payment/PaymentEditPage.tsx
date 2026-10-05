@@ -169,7 +169,7 @@ const PaymentEditPage: FC = () => {
             <p className="mt-1 text-xs text-gray-500 sm:text-sm">ID: {payment.id}</p>
           </div>
         </div>
-        <Button type="submit" form={FORM_ID} className="h-11">
+        <Button type="submit" variant="accent" form={FORM_ID} className="h-11">
           Saqlash
         </Button>
       </div>

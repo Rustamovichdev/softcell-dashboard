@@ -1,13 +1,16 @@
 import type { FC, ButtonHTMLAttributes } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "default" | "outline" | "ghost" | "destructive";
+  variant?: "default" | "accent" | "outline" | "outlineDanger" | "ghost" | "destructive";
   size?: "sm" | "md" | "lg";
 };
 
 const variantStyles = {
   default: "bg-gray-900 text-white hover:bg-gray-800",
+  accent: "bg-emerald-600 text-white hover:bg-emerald-700",
   outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
+  outlineDanger:
+    "border border-gray-300 bg-white text-gray-600 hover:border-red-300 hover:bg-red-50 hover:text-red-600",
   ghost: "bg-transparent text-gray-700 hover:bg-gray-100",
   destructive: "bg-red-600 text-white hover:bg-red-700",
 };

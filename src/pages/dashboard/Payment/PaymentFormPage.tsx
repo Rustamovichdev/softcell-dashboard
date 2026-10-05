@@ -117,10 +117,10 @@ const PaymentFormPage: FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h1 className="text-lg font-semibold sm:text-xl">Yangi to'lov qo'shish</h1>
         <div className="flex items-center gap-3">
-          <Button type="button" variant="outline" onClick={onCancel} className="h-11">
+          <Button type="button" variant="outlineDanger" onClick={onCancel} className="h-11">
             Bekor qilish
           </Button>
-          <Button type="submit" form={FORM_ID} className="h-11">
+          <Button type="submit" variant="accent" form={FORM_ID} className="h-11">
             Saqlash
           </Button>
         </div>

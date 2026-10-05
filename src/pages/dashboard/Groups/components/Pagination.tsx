@@ -28,7 +28,7 @@ const Pagination: FC<PaginationProps> = ({ page, totalPages, onChange }) => {
           type="button"
           onClick={() => onChange(pageNumber)}
           className={`h-9 min-w-9 rounded-lg px-3 text-sm font-medium transition ${
-            pageNumber === page ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"
+            pageNumber === page ? "bg-emerald-600 text-white" : "text-gray-600 hover:bg-gray-100"
           }`}
           aria-current={pageNumber === page ? "page" : undefined}
         >

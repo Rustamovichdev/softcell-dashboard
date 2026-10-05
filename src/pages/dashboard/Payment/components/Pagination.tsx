@@ -34,7 +34,7 @@ const Pagination: FC<PaginationProps> = ({ page, totalPages, onChange }) => {
           onClick={() => onChange(p)}
           className={`h-9 min-w-9 rounded-lg px-3 text-sm font-medium transition ${
             p === page
-              ? "bg-gray-900 text-white"
+              ? "bg-emerald-600 text-white"
               : "text-gray-600 hover:bg-gray-100"
           }`}
           aria-label={`Sahifa ${p}`}
