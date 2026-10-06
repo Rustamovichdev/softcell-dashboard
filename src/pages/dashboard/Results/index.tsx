@@ -1,366 +1,622 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Student = {
   id: number;
+  fullName: string;
   email: string;
-  phone: string;
-  district: string; // qayerdan ekanligi
-  source: string; // qayerdan bilgan
-  course: string; // kompyuter bo'yicha qaysi kursda o'qiydi
-  project: string; // nima dastur qilayotgani
   avatar: string;
+  course: string; // qaysi kompyuter kursida o'qiydi
+  phone: string;
+  district: string; // qayerdan
+  source: string; // qayerdan bilgan
+  project: string; // nima dastur qilayotgani
 };
 
-// O'z ma'lumotlaringizni shu yerga yozing.
-// Yangi o'quvchi qo'shish uchun { ... } blokni nusxalab, id ni o'zgartiring.
-const students: Student[] = [
-  { id: 1, email: "abdulaziz1@gmail.com", phone: "+998 90 123 45 67", district: "Chilonzor tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Portfolio sayti", avatar: "https://i.pravatar.cc/200?img=1" },
-  { id: 2, email: "malika2@gmail.com", phone: "+998 91 234 56 78", district: "Yunusobod tumani", source: "Internetdan eshitgani", course: "Python dasturlash", project: "Telegram bot (Python)", avatar: "https://i.pravatar.cc/200?img=2" },
-  { id: 3, email: "jasur3@gmail.com", phone: "+998 93 345 67 89", district: "Mirzo Ulug'bek tumani", source: "O'zi kelgani", course: "Backend (Node.js)", project: "Blog sayti (Node.js)", avatar: "https://i.pravatar.cc/200?img=3" },
-  { id: 4, email: "dilnoza4@gmail.com", phone: "+998 94 456 78 90", district: "Shayxontohur tumani", source: "Do'stidan eshitgani", course: "Grafik dizayn", project: "Do'kon veb-sayti (HTML, CSS)", avatar: "https://i.pravatar.cc/200?img=4" },
-  { id: 5, email: "sardor5@gmail.com", phone: "+998 95 567 89 01", district: "Yashnobod tumani", source: "Internetdan eshitgani", course: "Mobil ilovalar yaratish", project: "Ob-havo ilovasi (API bilan)", avatar: "https://i.pravatar.cc/200?img=5" },
-  { id: 6, email: "madina6@gmail.com", phone: "+998 97 678 90 12", district: "Olmazor tumani", source: "O'zi kelgani", course: "Kompyuter savodxonligi", project: "Kalkulyator dasturi (React)", avatar: "https://i.pravatar.cc/200?img=6" },
-  { id: 7, email: "bobur7@gmail.com", phone: "+998 98 789 01 23", district: "Sergeli tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Tik-Tak-Toe o'yini (JavaScript)", avatar: "https://i.pravatar.cc/200?img=7" },
-  { id: 8, email: "nodira8@gmail.com", phone: "+998 99 890 12 34", district: "Uchtepa tumani", source: "Internetdan eshitgani", course: "Python dasturlash", project: "Vazifalar ro'yxati (To-Do) ilovasi", avatar: "https://i.pravatar.cc/200?img=8" },
-  { id: 9, email: "otabek9@gmail.com", phone: "+998 90 901 23 45", district: "Yakkasaroy tumani", source: "O'zi kelgani", course: "Backend (Node.js)", project: "Blog sayti (Node.js)", avatar: "https://i.pravatar.cc/200?img=9" },
-  { id: 10, email: "zilola10@gmail.com", phone: "+998 91 012 34 56", district: "Mirobod tumani", source: "Do'stidan eshitgani", course: "Grafik dizayn", project: "Portfolio sayti", avatar: "https://i.pravatar.cc/200?img=10" },
-  { id: 11, email: "sherzod11@gmail.com", phone: "+998 93 111 22 33", district: "Bektemir tumani", source: "Internetdan eshitgani", course: "Mobil ilovalar yaratish", project: "Kalkulyator dasturi (React)", avatar: "https://i.pravatar.cc/200?img=11" },
-  { id: 12, email: "gulnora12@gmail.com", phone: "+998 94 222 33 44", district: "Yangihayot tumani", source: "O'zi kelgani", course: "Kompyuter savodxonligi", project: "Do'kon veb-sayti (HTML, CSS)", avatar: "https://i.pravatar.cc/200?img=12" },
-  { id: 13, email: "akmal13@gmail.com", phone: "+998 95 333 44 55", district: "Chilonzor tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Ob-havo ilovasi (API bilan)", avatar: "https://i.pravatar.cc/200?img=13" },
-  { id: 14, email: "shahlo14@gmail.com", phone: "+998 97 444 55 66", district: "Yunusobod tumani", source: "Internetdan eshitgani", course: "Python dasturlash", project: "Telegram bot (Python)", avatar: "https://i.pravatar.cc/200?img=14" },
-  { id: 15, email: "eldor15@gmail.com", phone: "+998 98 555 66 77", district: "Mirzo Ulug'bek tumani", source: "O'zi kelgani", course: "Backend (Node.js)", project: "Vazifalar ro'yxati (To-Do) ilovasi", avatar: "https://i.pravatar.cc/200?img=15" },
-  { id: 16, email: "feruza16@gmail.com", phone: "+998 99 666 77 88", district: "Shayxontohur tumani", source: "Do'stidan eshitgani", course: "Grafik dizayn", project: "Portfolio sayti", avatar: "https://i.pravatar.cc/200?img=16" },
-  { id: 17, email: "islom17@gmail.com", phone: "+998 90 777 88 99", district: "Yashnobod tumani", source: "Internetdan eshitgani", course: "Mobil ilovalar yaratish", project: "Tik-Tak-Toe o'yini (JavaScript)", avatar: "https://i.pravatar.cc/200?img=17" },
-  { id: 18, email: "kamola18@gmail.com", phone: "+998 91 888 99 00", district: "Olmazor tumani", source: "O'zi kelgani", course: "Kompyuter savodxonligi", project: "Kalkulyator dasturi (React)", avatar: "https://i.pravatar.cc/200?img=18" },
-  { id: 19, email: "lazizbek19@gmail.com", phone: "+998 93 999 00 11", district: "Sergeli tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Do'kon veb-sayti (HTML, CSS)", avatar: "https://i.pravatar.cc/200?img=19" },
-  { id: 20, email: "nigora20@gmail.com", phone: "+998 94 100 20 30", district: "Uchtepa tumani", source: "Internetdan eshitgani", course: "Python dasturlash", project: "Ob-havo ilovasi (API bilan)", avatar: "https://i.pravatar.cc/200?img=20" },
-  { id: 21, email: "rustam21@gmail.com", phone: "+998 95 200 30 40", district: "Yakkasaroy tumani", source: "O'zi kelgani", course: "Backend (Node.js)", project: "Blog sayti (Node.js)", avatar: "https://i.pravatar.cc/200?img=21" },
-  { id: 22, email: "sevara22@gmail.com", phone: "+998 97 300 40 50", district: "Mirobod tumani", source: "Do'stidan eshitgani", course: "Grafik dizayn", project: "Portfolio sayti", avatar: "https://i.pravatar.cc/200?img=22" },
-  { id: 23, email: "timur23@gmail.com", phone: "+998 98 400 50 60", district: "Bektemir tumani", source: "Internetdan eshitgani", course: "Mobil ilovalar yaratish", project: "Vazifalar ro'yxati (To-Do) ilovasi", avatar: "https://i.pravatar.cc/200?img=23" },
-  { id: 24, email: "umida24@gmail.com", phone: "+998 99 500 60 70", district: "Yangihayot tumani", source: "O'zi kelgani", course: "Kompyuter savodxonligi", project: "Tik-Tak-Toe o'yini (JavaScript)", avatar: "https://i.pravatar.cc/200?img=24" },
-  { id: 25, email: "javohir25@gmail.com", phone: "+998 90 600 70 80", district: "Chilonzor tumani", source: "Do'stidan eshitgani", course: "Frontend (HTML, CSS, JavaScript, React)", project: "Telegram bot (Python)", avatar: "https://i.pravatar.cc/200?img=25" },
+const NAMES = [
+  "Abdulaziz Karimov", "Malika Rahimova", "Jasur Toshmatov", "Dilnoza Yusupova", "Sardor Qodirov",
+  "Madina Aliyeva", "Bobur Ismoilov", "Zilola Hamidova", "Otabek Nazarov", "Nilufar Saidova",
+  "Sherzod Abdullayev", "Gulnora Ergasheva", "Javohir Mirzayev", "Kamola Tursunova", "Akmal Rustamov",
+  "Shahzoda Ormonova", "Ulugbek Xolmatov", "Feruza Normatova", "Doniyor Sobirov", "Sevara Qosimova",
+  "Humoyun Baxtiyorov", "Laylo Davronova", "Azizbek Yuldashev", "Munisa Karimova", "Temur Ochilov",
 ];
 
-const styles = `
-.results {
-  min-height: 100vh;
-  padding: 32px 20px;
-  background: #f8fafc;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-  box-sizing: border-box;
-}
-.results-wrap { width: 100%; }
-.results-title { margin: 0 0 20px; font-size: 28px; color: #0f172a; }
+const COURSES = [
+  "Frontend (HTML, CSS, JavaScript)",
+  "Python",
+  "Backend",
+  "Kompyuter savodxonligi",
+  "Mobil dasturlash",
+  "Web dizayn (UI/UX)",
+  "Grafik dizayn",
+  "Scratch (bolalar uchun)",
+];
 
-.results-top {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.results-search {
-  flex: 1;
-  min-width: 220px;
-  padding: 12px 18px;
-  font-size: 15px;
-  border: 1px solid #e2e8f0;
-  border-radius: 999px;
-  outline: none;
-  background: #fff;
-}
-.results-search:focus { border-color: #0f172a; }
-.results-size {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #475569;
-  font-size: 14px;
-}
-.results-size select {
-  padding: 10px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  background: #fff;
-  font-size: 14px;
-  cursor: pointer;
-}
+const DISTRICTS = [
+  "Chilonzor", "Yunusobod", "Mirzo Ulug'bek", "Sergeli", "Yakkasaroy",
+  "Olmazor", "Shayxontohur", "Bektemir", "Mirobod", "Uchtepa",
+];
 
-.results-card-table {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  overflow: hidden;
-}
-.results-table { width: 100%; border-collapse: collapse; }
-.results-table th {
-  text-align: left;
-  padding: 16px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  background: #f8fafc;
-}
-.results-table th:first-child,
-.results-table td:first-child { width: 60px; }
-.results-table td {
-  padding: 12px 16px;
-  border-top: 1px solid #f1f5f9;
-  color: #1e293b;
-  font-size: 15px;
-}
-.results-table tbody tr { cursor: pointer; transition: background 0.15s; }
-.results-table tbody tr:hover { background: #f8fafc; }
-.results-user { display: flex; align-items: center; gap: 14px; }
-.results-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #0f172a;
-  background: #e2e8f0;
-  flex-shrink: 0;
-}
-.results-email {
-  font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.results-empty { padding: 32px; text-align: center; color: #64748b; }
+const SOURCES = ["O'zi kelgan", "Internetdan eshitgan", "Do'stidan eshitgan"];
 
-.results-pages {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 20px;
-}
-.results-pages button {
-  min-width: 36px;
-  height: 36px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 14px;
-  color: #0f172a;
-}
-.results-pages button:hover:not(:disabled) { background: #f1f5f9; }
-.results-pages button.active { background: #0f172a; color: #fff; border-color: #0f172a; }
-.results-pages button:disabled { color: #cbd5e1; cursor: not-allowed; }
+const PROJECTS = [
+  "Davomat kuzatish ilovasi",
+  "Dars tayyorlashga yordam beruvchi Telegram bot",
+  "Yaqin oshxonalardan buyurtma berish xizmati",
+  "Shaxsiy portfolio sayti",
+  "Xarajatlarni hisoblash ilovasi",
+  "Onlayn kutubxona",
+  "Ob-havo ilovasi",
+  "Kichik o'yin (Scratch)",
+];
 
-/* Butun ekran */
-.results-full {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  overflow-y: auto;
-  background: #f8fafc;
-  padding: 24px 20px 48px;
-  box-sizing: border-box;
-  animation: results-fade 0.2s ease;
-}
-@keyframes results-fade {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.results-back {
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  padding: 10px 18px;
-  border-radius: 999px;
-  cursor: pointer;
-  font-size: 15px;
-}
-.results-back:hover { background: #f1f5f9; }
-.results-profile { max-width: 600px; margin: 32px auto 0; text-align: center; }
-.results-big-avatar {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #0f172a;
-  margin-bottom: 16px;
-  background: #e2e8f0;
-}
-.results-profile h2 { margin: 0 0 24px; font-size: 26px; color: #0f172a; }
-.results-info {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 18px 22px;
-  margin-bottom: 14px;
-  text-align: left;
-}
-.results-info small {
-  display: block;
-  color: #64748b;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 6px;
-}
-.results-info p { margin: 0; font-size: 18px; color: #0f172a; }
-`;
+const STUDENTS: Student[] = NAMES.map((fullName, i) => {
+  const n = i + 1;
+  const first = fullName.split(" ")[0].toLowerCase();
+  return {
+    id: n,
+    fullName,
+    email: `${first}${n}@gmail.com`,
+    avatar: `https://i.pravatar.cc/80?img=${n}`,
+    course: COURSES[i % COURSES.length],
+    phone: `+998 9${i % 10} ${100 + n} ${10 + (n % 80)} ${20 + (n % 70)}`,
+    district: DISTRICTS[i % DISTRICTS.length],
+    source: SOURCES[i % SOURCES.length],
+    project: PROJECTS[i % PROJECTS.length],
+  };
+});
 
-export default function Results() {
+const PAGE_SIZES = [2, 5, 6, 10];
+
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+// Rasm yuklanmasa, ism bosh harflari ko'rsatiladi
+const Avatar = ({ student, size }: { student: Student; size: number }) => {
+  const [failed, setFailed] = useState(false);
+  const style = { width: size, height: size, fontSize: size * 0.36 };
+
+  if (failed) {
+    return (
+      <span className="results__avatar results__avatar--fallback" style={style}>
+        {initials(student.fullName)}
+      </span>
+    );
+  }
+  return (
+    <img
+      className="results__avatar"
+      style={style}
+      src={student.avatar}
+      alt={student.fullName}
+      onError={() => setFailed(true)}
+    />
+  );
+};
+
+const Results = () => {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(6);
   const [selected, setSelected] = useState<Student | null>(null);
 
-  const q = query.trim().toLowerCase();
-  const filtered = students.filter(
-    (s) =>
-      s.email.toLowerCase().includes(q) ||
-      s.phone.includes(q) ||
-      s.district.toLowerCase().includes(q) ||
-      s.source.toLowerCase().includes(q) ||
-      s.course.toLowerCase().includes(q) ||
-      s.project.toLowerCase().includes(q)
-  );
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return STUDENTS;
+    return STUDENTS.filter(
+      (s) =>
+        s.fullName.toLowerCase().includes(q) ||
+        s.course.toLowerCase().includes(q) ||
+        s.email.toLowerCase().includes(q) ||
+        s.phone.toLowerCase().includes(q) ||
+        s.district.toLowerCase().includes(q)
+    );
+  }, [query]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-  const current = Math.min(page, totalPages);
-  const start = (current - 1) * pageSize;
-  const visible = filtered.slice(start, start + pageSize);
+  const currentPage = Math.min(page, totalPages);
+  const pageItems = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
-  // ko'rinadigan sahifa tugmalari (ko'pi bilan 5 ta)
-  const windowStart = Math.max(1, Math.min(current - 2, totalPages - 4));
-  const windowEnd = Math.min(totalPages, windowStart + 4);
-  const pageNumbers: number[] = [];
-  for (let p = windowStart; p <= windowEnd; p++) pageNumbers.push(p);
+  // Esc bosilganda to'liq ekran oynasi yopiladi
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelected(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected]);
 
   return (
     <div className="results">
-      <style>{styles}</style>
+      <style>{`
+        .results {
+          width: 100%;
+          padding: 32px 24px 64px;
+          font-family: "Segoe UI", Roboto, Arial, sans-serif;
+          color: #111827;
+          box-sizing: border-box;
+        }
 
-      <div className="results-wrap">
-        <h1 className="results-title">O'quvchilar</h1>
+        .results__title {
+          font-size: 24px;
+          font-weight: 700;
+          margin: 0;
+        }
 
-        <div className="results-top">
-          <input
-            className="results-search"
-            placeholder="🔍 Qidirish..."
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(1);
-            }}
-          />
-          <label className="results-size">
-            Sahifada:
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setPage(1);
-              }}
-            >
-              {[2, 5, 6, 10, 25].map((n) => (
-                <option key={n} value={n}>
-                  {n} ta
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+        .results__subtitle {
+          color: #6b7280;
+          font-size: 14px;
+          margin: 4px 0 20px;
+        }
 
-        <div className="results-card-table">
-          {visible.length === 0 ? (
-            <div className="results-empty">Hech narsa topilmadi</div>
-          ) : (
-            <table className="results-table">
+        .results__search {
+          position: relative;
+          margin-bottom: 20px;
+        }
+
+        .results__search svg {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #9ca3af;
+        }
+
+        .results__search input {
+          width: 100%;
+          box-sizing: border-box;
+          border: 1px solid #e5e7eb;
+          border-radius: 10px;
+          padding: 11px 14px 11px 40px;
+          font-size: 14px;
+          font-family: inherit;
+          outline: none;
+          background: #fff;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .results__search input:focus {
+          border-color: #111827;
+          box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+        }
+
+        .results__empty {
+          color: #6b7280;
+          font-size: 15px;
+          padding: 40px 0;
+          text-align: center;
+          background: #fff;
+          border-radius: 12px;
+          border: 1px solid #eef0f2;
+        }
+
+        .results__table-wrap {
+          width: 100%;
+          overflow-x: auto;
+          border-radius: 12px;
+          border: 1px solid #eef0f2;
+          background: #fff;
+        }
+
+        .results__table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        .results__table th,
+        .results__table td {
+          padding: 12px 20px;
+          text-align: left;
+          font-size: 14px;
+        }
+
+        .results__table th {
+          font-weight: 600;
+          font-size: 12px;
+          color: #6b7280;
+          background: #f9fafb;
+          border-bottom: 1px solid #eef0f2;
+          white-space: nowrap;
+        }
+
+        .results__table td:first-child,
+        .results__table th:first-child {
+          width: 64px;
+          color: #6b7280;
+        }
+
+        .results__table tbody tr {
+          border-bottom: 1px solid #f3f4f6;
+          cursor: pointer;
+          transition: background 0.15s ease;
+        }
+
+        .results__table tbody tr:last-child {
+          border-bottom: none;
+        }
+
+        .results__table tbody tr:hover {
+          background: #f9fafb;
+        }
+
+        .results__user {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .results__avatar {
+          flex-shrink: 0;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #111827;
+          box-sizing: border-box;
+        }
+
+        .results__avatar--fallback {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: #e5e7eb;
+          color: #374151;
+          font-weight: 700;
+        }
+
+        .results__name {
+          font-weight: 600;
+        }
+
+        .results__course {
+          margin-left: 6px;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: #eef2ff;
+          color: #4338ca;
+          font-size: 12px;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+
+        .results__footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-top: 20px;
+        }
+
+        .results__size {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          color: #6b7280;
+        }
+
+        .results__size select {
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 6px 10px;
+          font-size: 13px;
+          font-family: inherit;
+          background: #fff;
+          color: #111827;
+          cursor: pointer;
+        }
+
+        .results__pagination {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+
+        .results__page-btn {
+          min-width: 34px;
+          height: 34px;
+          border-radius: 8px;
+          border: 1px solid #e5e7eb;
+          background: #fff;
+          color: #374151;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          padding: 0 10px;
+          transition: background 0.15s ease;
+        }
+
+        .results__page-btn:hover:not(:disabled) {
+          background: #f3f4f6;
+        }
+
+        .results__page-btn:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .results__page-btn--active,
+        .results__page-btn--active:hover:not(:disabled) {
+          background: #111827;
+          border-color: #111827;
+          color: #fff;
+        }
+
+        /* To'liq ekran tafsilotlar */
+        .results__detail {
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          background: #f9fafb;
+          overflow-y: auto;
+          padding: 32px 24px 64px;
+          box-sizing: border-box;
+        }
+
+        .results__detail-inner {
+          max-width: 760px;
+          margin: 0 auto;
+        }
+
+        .results__back {
+          border: 1px solid #e5e7eb;
+          background: #fff;
+          border-radius: 10px;
+          padding: 9px 16px;
+          font-size: 14px;
+          font-weight: 600;
+          font-family: inherit;
+          color: #374151;
+          cursor: pointer;
+          margin-bottom: 24px;
+        }
+
+        .results__back:hover {
+          background: #f3f4f6;
+        }
+
+        .results__hero {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          margin-bottom: 24px;
+        }
+
+        .results__hero-name {
+          margin: 0;
+          font-size: 26px;
+          font-weight: 700;
+        }
+
+        .results__hero-email {
+          margin: 4px 0 0;
+          color: #6b7280;
+          font-size: 14px;
+        }
+
+        .results__card {
+          background: #fff;
+          border: 1px solid #eef0f2;
+          border-radius: 12px;
+          padding: 8px 24px;
+        }
+
+        .results__row {
+          display: flex;
+          gap: 16px;
+          padding: 16px 0;
+          border-bottom: 1px solid #f3f4f6;
+        }
+
+        .results__row:last-child {
+          border-bottom: none;
+        }
+
+        .results__label {
+          flex: 0 0 200px;
+          color: #6b7280;
+          font-size: 14px;
+        }
+
+        .results__value {
+          flex: 1;
+          font-size: 15px;
+          font-weight: 500;
+        }
+
+        @media (max-width: 640px) {
+          .results {
+            padding: 24px 16px 48px;
+          }
+
+          .results__table th,
+          .results__table td {
+            padding: 10px 12px;
+          }
+
+          .results__user {
+            flex-wrap: wrap;
+            gap: 8px 12px;
+          }
+
+          .results__course {
+            margin-left: 0;
+          }
+
+          .results__row {
+            flex-direction: column;
+            gap: 4px;
+          }
+
+          .results__label {
+            flex: none;
+          }
+
+          .results__footer {
+            justify-content: center;
+          }
+        }
+      `}</style>
+
+      <h1 className="results__title">O'quvchilar ro'yxati</h1>
+      <p className="results__subtitle">Jami: {STUDENTS.length} ta o'quvchi</p>
+
+      <div className="results__search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+          <path d="m20 20-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Ism, kurs, email yoki telefon bo'yicha qidirish..."
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setPage(1);
+          }}
+        />
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="results__empty">Hech narsa topilmadi</p>
+      ) : (
+        <>
+          <div className="results__table-wrap">
+            <table className="results__table">
               <thead>
                 <tr>
                   <th>№</th>
-                  <th>Email</th>
+                  <th>O'quvchi</th>
                 </tr>
               </thead>
               <tbody>
-                {visible.map((s, i) => (
+                {pageItems.map((s, i) => (
                   <tr key={s.id} onClick={() => setSelected(s)}>
-                    <td>{start + i + 1}</td>
+                    <td>{(currentPage - 1) * pageSize + i + 1}</td>
                     <td>
-                      <div className="results-user">
-                        <img
-                          className="results-avatar"
-                          src={s.avatar}
-                          alt={s.email}
-                        />
-                        <span className="results-email">{s.email}</span>
+                      <div className="results__user">
+                        <Avatar student={s} size={40} />
+                        <span className="results__name">{s.fullName}</span>
+                        <span className="results__course">{s.course}</span>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
 
-        <div className="results-pages">
-          <button
-            disabled={current === 1}
-            onClick={() => setPage(current - 1)}
-          >
-            &lt;
-          </button>
-          {pageNumbers.map((p) => (
-            <button
-              key={p}
-              className={p === current ? "active" : ""}
-              onClick={() => setPage(p)}
-            >
-              {p}
-            </button>
-          ))}
-          <button
-            disabled={current === totalPages}
-            onClick={() => setPage(current + 1)}
-          >
-            &gt;
-          </button>
-        </div>
-      </div>
+          <div className="results__footer">
+            <label className="results__size">
+              Sahifada:
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(1);
+                }}
+              >
+                {PAGE_SIZES.map((n) => (
+                  <option key={n} value={n}>
+                    {n} ta
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {totalPages > 1 && (
+              <div className="results__pagination">
+                <button
+                  type="button"
+                  className="results__page-btn"
+                  onClick={() => setPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  aria-label="Oldingi"
+                >
+                  {"<"}
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className={
+                      "results__page-btn" +
+                      (n === currentPage ? " results__page-btn--active" : "")
+                    }
+                    onClick={() => setPage(n)}
+                  >
+                    {n}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className="results__page-btn"
+                  onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  aria-label="Keyingi"
+                >
+                  {">"}
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       {selected && (
-        <div className="results-full">
-          <button className="results-back" onClick={() => setSelected(null)}>
-            ← Orqaga
-          </button>
+        <div className="results__detail">
+          <div className="results__detail-inner">
+            <button
+              type="button"
+              className="results__back"
+              onClick={() => setSelected(null)}
+            >
+              ← Orqaga
+            </button>
 
-          <div className="results-profile">
-            <img
-              className="results-big-avatar"
-              src={selected.avatar}
-              alt={selected.email}
-            />
-            <h2>{selected.email}</h2>
+            <div className="results__hero">
+              <Avatar student={selected} size={84} />
+              <div>
+                <h2 className="results__hero-name">{selected.fullName}</h2>
+                <p className="results__hero-email">{selected.email}</p>
+              </div>
+            </div>
 
-            <div className="results-info">
-              <small>Telefon</small>
-              <p>{selected.phone}</p>
-            </div>
-            <div className="results-info">
-              <small>Qayerdan ekanligi</small>
-              <p>{selected.district}</p>
-            </div>
-            <div className="results-info">
-              <small>Qayerdan bilgan</small>
-              <p>{selected.source}</p>
-            </div>
-            <div className="results-info">
-              <small>Qaysi kursda o'qiydi</small>
-              <p>{selected.course}</p>
-            </div>
-            <div className="results-info">
-              <small>Nima dastur qilyapti</small>
-              <p>{selected.project}</p>
+            <div className="results__card">
+              <div className="results__row">
+                <span className="results__label">Kompyuter kursi</span>
+                <span className="results__value">{selected.course}</span>
+              </div>
+              <div className="results__row">
+                <span className="results__label">Telefon raqami</span>
+                <span className="results__value">{selected.phone}</span>
+              </div>
+              <div className="results__row">
+                <span className="results__label">Qayerdan (tuman)</span>
+                <span className="results__value">{selected.district}</span>
+              </div>
+              <div className="results__row">
+                <span className="results__label">Qayerdan bilgan</span>
+                <span className="results__value">{selected.source}</span>
+              </div>
+              <div className="results__row">
+                <span className="results__label">Qilayotgan dasturi</span>
+                <span className="results__value">{selected.project}</span>
+              </div>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default Results;
